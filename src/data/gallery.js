@@ -6,6 +6,9 @@ export const galleryCategories = [
   { id: 'planning', label: 'Event Planning', service: 'event-management' },
 ]
 
+// Photos the owner uploads at /admin always show first. Set this to false to hide the stock photos below.
+export const showStockPhotos = true
+
 // Images are Pixabay stock placeholders (see IMAGE-CREDITS.md).
 // TODO: swap in real Toylad Concept photos.
 const gallery = [

@@ -57,6 +57,8 @@ export default function GalleryLightbox({ item, category, position, total, onClo
           aspect={null}
           rounded="rounded-none"
           loading="eager"
+          srcSet={item.srcSet}
+          sizes={item.srcSet && '(min-width: 768px) 448px, 100vw'}
           className="aspect-[4/3] md:aspect-[4/5]"
         />
 
@@ -67,7 +69,7 @@ export default function GalleryLightbox({ item, category, position, total, onClo
           <h3 id="lightbox-title" className="mt-4 pr-10 text-xl font-semibold md:pr-0 md:text-2xl">
             {item.title}
           </h3>
-          <p className="mt-3 text-base leading-relaxed text-espresso/75">{item.description}</p>
+          {item.description && <p className="mt-3 text-base leading-relaxed text-espresso/75">{item.description}</p>}
           <p className="mt-4 font-display text-lg font-semibold text-terracotta-deep">{site.priceNote}</p>
 
           <Button

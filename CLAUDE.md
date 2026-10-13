@@ -4,8 +4,9 @@ Luxury showcase, menu and booking site for Toylad Concept: custom cakes, artisan
 
 ## Stack
 - React + Vite (JavaScript/JSX), Tailwind CSS v4 via `@tailwindcss/vite`, Lucide React icons
-- No backend: forms compose a pre-filled WhatsApp message (`https://wa.me/<number>?text=`)
-- Commands: `npm run dev` · `npm run build` · `npm run lint`
+- Booking forms compose a pre-filled WhatsApp message (`https://wa.me/<number>?text=`)
+- Admin photo uploads: Vercel serverless functions in `/api` (Node runtime), MongoDB Atlas, Cloudinary
+- Commands: `npm run dev` · `npm run build` · `npm run lint` · `npm run hash-password` · `npx vercel dev` (site + API)
 
 ## Structure
 ```text
@@ -15,8 +16,15 @@ src/
   components/ui/        Container, Button, SectionHeading, SmartImage
   data/                 site.js (contact, WhatsApp, locations, hours, socials, academy), services.js,
                         gallery.js, packages.js, testimonials.js, stats.js
-  App.jsx  main.jsx  index.css
-public/images/          local images (placeholders until real photos arrive)
+  admin/                lazy-loaded /admin area: AdminApp (dashboard sections), login, photo screens, api.js
+  hooks/  utils/        useUploadedPhotos (gallery fetch), cloudinary.js (image URLs), booking.js, format.js
+  App.jsx  Root.jsx (picks site or admin)  main.jsx  index.css
+api/
+  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, photos.js
+  auth/                 login, logout, me
+  photos.js             public list of published photos
+  admin/                upload-signature, photos/index (list, create), photos/[id] (edit, delete)
+public/images/          local stock images    scripts/hash-password.js    vercel.json (/admin rewrite, noindex)
 ```
 
 ## Design tokens (defined once in `src/index.css` under `@theme`)
@@ -46,8 +54,16 @@ public/images/          local images (placeholders until real photos arrive)
 - Each section has an `id` matching its nav anchor and `scroll-mt-24`; `html` has `scroll-smooth`.
 - Accessibility: semantic landmarks, alt text on every image, labelled form fields, `aria-label` on icon-only buttons, Esc closes menus and modals.
 - Focus rings: `focus-visible:ring-2 ring-teal`.
-- Images: local files only, from free-license sources (Unsplash, Pexels, Pixabay) with credits logged in IMAGE-CREDITS.md; never hotlink or use Google Images/Pinterest. Max 1600px wide, under ~300KB.
+- Stock images: local files only, from free-license sources (Unsplash, Pexels, Pixabay) with credits logged in IMAGE-CREDITS.md; never hotlink or use Google Images/Pinterest. Max 1600px wide, under ~300KB.
 - Image loading: `loading="lazy"` except the hero; fixed aspect ratios to prevent layout shift.
 - Testimonials use initials avatars, never stock photos of faces.
 - Keep components under ~150 lines; split if larger. No new dependencies without asking.
 - Placeholder contact details, prices and stats are marked `// TODO` in `src/data/`.
+
+## Backend and security rules
+- Env vars, server only (never `VITE_`-prefixed, never committed, documented in README.md): `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ADMIN_PASSWORD_HASH` (bcrypt), `SESSION_SECRET` (32+ chars).
+- Wrap every handler in `route()` from `api/_lib/http.js`; every `/api/admin/*` route passes `{ auth: true }`. Validate all input on the server and throw `HttpError(status, message)`; responses are JSON, errors are `{ error }`.
+- Uploads go from the browser straight to Cloudinary with a signed request (folder `toylad/gallery`). Read image URL and size from Cloudinary, never from the browser. Show uploads through `cloudinaryUrl()` (`f_auto,q_auto`).
+- Session is an httpOnly, Secure, SameSite=Lax JWT cookie (7 days). Nothing secret in localStorage or the bundle.
+- The public gallery must still work when the API fails: stock photos are the fallback (`showStockPhotos` in `gallery.js`).
+- Admin screens: plain wording for a non-technical owner, tap targets at least 48px, new dashboard areas go in `sections` in `AdminApp.jsx`.

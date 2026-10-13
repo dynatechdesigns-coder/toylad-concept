@@ -13,6 +13,8 @@ export default function GalleryCard({ item, categoryLabel, aspect, onOpen }) {
         src={item.image}
         alt={item.title}
         aspect={aspect}
+        srcSet={item.srcSet}
+        sizes={item.srcSet && '(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw'}
         imgClassName="transition duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
       />
       <span className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-espresso/90 via-espresso/30 to-transparent p-4 opacity-0 transition duration-300 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-100">

@@ -1,19 +1,13 @@
-import { useState } from 'react'
-import gallery, { galleryCategories } from '../../data/gallery'
+import { useMemo, useState } from 'react'
+import gallery, { galleryCategories, showStockPhotos } from '../../data/gallery'
+import useUploadedPhotos from '../../hooks/useUploadedPhotos'
 import Container from '../ui/Container'
 import SectionHeading from '../ui/SectionHeading'
 import Tabs from '../ui/Tabs'
 import GalleryCard from './GalleryCard'
 import GalleryLightbox from './GalleryLightbox'
 
-const tabs = [
-  { id: 'all', label: 'All', count: gallery.length },
-  ...galleryCategories.map((category) => ({
-    id: category.id,
-    label: category.label,
-    count: gallery.filter((item) => item.category === category.id).length,
-  })),
-]
+const stockPhotos = showStockPhotos ? gallery : []
 const categoryById = Object.fromEntries(galleryCategories.map((category) => [category.id, category]))
 // Cycled by position to give the columns a masonry feel.
 const aspects = ['4 / 5', '1 / 1', '3 / 4', '4 / 3', '1 / 1']
@@ -21,8 +15,22 @@ const aspects = ['4 / 5', '1 / 1', '3 / 4', '4 / 3', '1 / 1']
 export default function Gallery({ setBookingPreset }) {
   const [filter, setFilter] = useState('all')
   const [openId, setOpenId] = useState(null)
+  const uploaded = useUploadedPhotos()
 
-  const items = filter === 'all' ? gallery : gallery.filter((item) => item.category === filter)
+  // The owner's uploads come first, then the stock photos.
+  const all = useMemo(() => [...uploaded, ...stockPhotos], [uploaded])
+  const tabs = useMemo(
+    () => [
+      { id: 'all', label: 'All', count: all.length },
+      ...galleryCategories.map((category) => ({
+        id: category.id,
+        label: category.label,
+        count: all.filter((item) => item.category === category.id).length,
+      })),
+    ],
+    [all],
+  )
+  const items = filter === 'all' ? all : all.filter((item) => item.category === filter)
   const openIndex = items.findIndex((item) => item.id === openId)
   const openItem = items[openIndex]
   const step = (offset) => setOpenId(items[(openIndex + offset + items.length) % items.length].id)
@@ -62,6 +70,7 @@ export default function Gallery({ setBookingPreset }) {
             />
           ))}
         </div>
+        {items.length === 0 && <p className="mt-8 text-center text-base text-espresso/75">New photos are coming soon.</p>}
       </Container>
 
       {openItem && (
