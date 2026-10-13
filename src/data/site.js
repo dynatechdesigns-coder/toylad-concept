@@ -20,13 +20,12 @@ const site = {
   // `icon` is a SocialIcon name; `label` completes "Toylad Concept on …".
   socials: [
     { id: 'instagram', icon: 'instagram', label: 'Instagram', url: 'https://www.instagram.com/toyladconcept' },
-    { id: 'tiktok', icon: 'tiktok', label: 'TikTok', url: 'https://www.tiktok.com/@toyladconcept' },
+    { id: 'tiktok', icon: 'tiktok', label: 'TikTok', url: 'https://www.tiktok.com/@toyinomoibadan' },
     {
       id: 'facebook-page',
       icon: 'facebook',
       label: 'Facebook: Toyladconcept cakes and Event',
-      // TODO: replace this Facebook search link with the real page URL
-      url: 'https://www.facebook.com/search/top/?q=Toyladconcept%20cakes%20and%20Event',
+      url: 'https://www.facebook.com/TOYLAD1st',
     },
     { id: 'facebook-alpha', icon: 'facebook', label: 'Facebook: alpha.cake', url: 'https://www.facebook.com/alpha.cake' },
   ],
