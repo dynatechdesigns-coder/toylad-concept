@@ -12,7 +12,6 @@ const link =
   'inline-flex min-h-11 items-center rounded-full text-cream/80 transition duration-300 ease-out decoration-butter underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-butter motion-reduce:transition-none'
 
 const year = new Date().getFullYear()
-const socialLabels = { instagram: 'Instagram', facebook: 'Facebook', tiktok: 'TikTok' }
 const linkColumns = [
   { title: 'Quick Links', links: navLinks.map(({ id, label }) => ({ key: id, label, href: `#${id}` })) },
   { title: 'Services', links: services.map(({ id, title }) => ({ key: id, label: title, href: '#services' })) },
@@ -25,17 +24,18 @@ export default function Footer() {
         <div className="sm:col-span-2 lg:col-span-1">
           <Logo tone="dark" />
           <p className="mt-4 max-w-xs text-base leading-relaxed text-cream/75">{site.tagline}</p>
-          <ul className="mt-6 flex gap-3">
-            {Object.entries(site.socials).map(([name, url]) => (
-              <li key={name}>
+          <ul className="mt-6 flex flex-wrap gap-3">
+            {site.socials.map(({ id, icon, label, url }) => (
+              <li key={id}>
                 <a
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${site.name} on ${socialLabels[name]} (opens in a new tab)`}
+                  aria-label={`${site.name} on ${label} (opens in a new tab)`}
+                  title={label}
                   className="flex size-11 items-center justify-center rounded-full border border-cream/20 text-cream transition duration-300 ease-out hover:border-butter hover:bg-butter hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-butter motion-reduce:transition-none"
                 >
-                  <SocialIcon name={name} />
+                  <SocialIcon name={icon} />
                 </a>
               </li>
             ))}

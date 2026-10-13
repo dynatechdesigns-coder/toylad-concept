@@ -47,7 +47,7 @@ export default function Packages({ setBookingPreset }) {
         </div>
 
         <p className="mx-auto mt-10 max-w-2xl text-center text-sm text-espresso/70 lg:mt-14">
-          Prices are starting points. Your final quote depends on design, size and date.
+          Every order is unique. Message us for a friendly quote tailored to your event.
         </p>
       </Container>
     </section>

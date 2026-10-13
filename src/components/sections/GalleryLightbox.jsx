@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
-import { formatPrice } from '../../utils/format'
+import site from '../../data/site'
 import Button from '../ui/Button'
 import SmartImage from '../ui/SmartImage'
 
@@ -68,11 +68,7 @@ export default function GalleryLightbox({ item, category, position, total, onClo
             {item.title}
           </h3>
           <p className="mt-3 text-base leading-relaxed text-espresso/75">{item.description}</p>
-          {item.priceFrom && (
-            <p className="mt-4 text-sm text-espresso/75">
-              From <span className="font-display text-2xl font-bold text-terracotta-deep">{formatPrice(item.priceFrom)}</span>
-            </p>
-          )}
+          <p className="mt-4 font-display text-lg font-semibold text-terracotta-deep">{site.priceNote}</p>
 
           <Button
             href="#booking"

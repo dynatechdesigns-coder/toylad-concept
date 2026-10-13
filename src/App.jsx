@@ -2,6 +2,7 @@ import { useState } from 'react'
 import FloatingWhatsApp from './components/layout/FloatingWhatsApp'
 import Footer from './components/layout/Footer'
 import Navbar from './components/layout/Navbar'
+import Academy from './components/sections/Academy'
 import Booking from './components/sections/Booking'
 import Gallery from './components/sections/Gallery'
 import Hero from './components/sections/Hero'
@@ -23,6 +24,7 @@ export default function App() {
         <Packages setBookingPreset={setBookingPreset} />
         <Testimonials />
         <Booking bookingPreset={bookingPreset} />
+        <Academy />
       </main>
       <Footer />
       <FloatingWhatsApp />

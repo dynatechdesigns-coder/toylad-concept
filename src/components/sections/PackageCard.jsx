@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react'
-import { formatPrice } from '../../utils/format'
+import site from '../../data/site'
 import Button from '../ui/Button'
 
 export default function PackageCard({ tier, groupLabel, onSelect }) {
@@ -17,9 +17,7 @@ export default function PackageCard({ tier, groupLabel, onSelect }) {
 
       <h3 className="text-xl font-semibold md:text-2xl">{tier.name}</h3>
       <p className="mt-1 text-sm text-espresso/70">{tier.covers}</p>
-      <p className="mt-6 text-sm text-espresso/70">
-        from <span className="font-display text-4xl font-bold text-espresso">{formatPrice(tier.priceFrom)}</span>
-      </p>
+      <p className="mt-6 font-display text-xl font-semibold text-terracotta-deep">{site.priceNote}</p>
 
       <ul className="mb-8 mt-6 space-y-3">
         {tier.features.map((feature) => (
@@ -36,8 +34,11 @@ export default function PackageCard({ tier, groupLabel, onSelect }) {
         onClick={onSelect}
         className="mt-auto w-full"
       >
-        Book {tier.name}
-        <span className="sr-only"> ({groupLabel})</span>
+        Get a quote
+        <span className="sr-only">
+          {' '}
+          for {tier.name} ({groupLabel})
+        </span>
       </Button>
     </article>
   )

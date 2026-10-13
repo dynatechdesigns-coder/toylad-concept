@@ -1,5 +1,5 @@
 // `service` is the booking option the group's CTAs pre-select; each tier `id` is the package value.
-// TODO: every price, serving size and feature list below is a placeholder.
+// TODO: every serving size and feature list below is a placeholder.
 const packageGroups = [
   {
     id: 'cakes',
@@ -9,7 +9,6 @@ const packageGroups = [
       {
         id: 'cake-classic',
         name: 'Classic',
-        priceFrom: 25000, // TODO
         covers: 'Serves 10–15 guests',
         features: ['Single-tier 8-inch cake', 'Choice of 3 flavours', 'Buttercream finish', 'Custom message topper'],
       },
@@ -17,7 +16,6 @@ const packageGroups = [
         id: 'cake-signature',
         name: 'Signature',
         featured: true,
-        priceFrom: 60000, // TODO
         covers: 'Serves 30–40 guests',
         features: [
           'Two-tier custom design',
@@ -30,7 +28,6 @@ const packageGroups = [
       {
         id: 'cake-luxe',
         name: 'Luxe',
-        priceFrom: 150000, // TODO
         covers: 'Serves 80+ guests',
         features: [
           'Three or more tiers',
@@ -51,7 +48,6 @@ const packageGroups = [
       {
         id: 'pastry-classic',
         name: 'Classic',
-        priceFrom: 12000, // TODO
         covers: 'Box for 4–6 people',
         features: ['12 assorted pastries', 'Choice of 2 flavours', 'Gift-ready box', 'Pickup or delivery'],
       },
@@ -59,7 +55,6 @@ const packageGroups = [
         id: 'pastry-signature',
         name: 'Signature',
         featured: true,
-        priceFrom: 30000, // TODO
         covers: 'Treats for 15–20 guests',
         features: [
           '36 assorted pastries',
@@ -72,7 +67,6 @@ const packageGroups = [
       {
         id: 'pastry-luxe',
         name: 'Luxe',
-        priceFrom: 85000, // TODO
         covers: 'Dessert table for 50+ guests',
         features: [
           '100+ mixed desserts',
@@ -92,7 +86,6 @@ const packageGroups = [
       {
         id: 'decor-classic',
         name: 'Classic',
-        priceFrom: 80000, // TODO
         covers: 'Intimate events up to 30 guests',
         features: ['Themed backdrop', 'Balloon garland', 'Cake table styling', 'Setup and take-down'],
       },
@@ -100,7 +93,6 @@ const packageGroups = [
         id: 'decor-signature',
         name: 'Signature',
         featured: true,
-        priceFrom: 250000, // TODO
         covers: 'Events up to 150 guests',
         features: [
           'Custom stage backdrop',
@@ -113,7 +105,6 @@ const packageGroups = [
       {
         id: 'decor-luxe',
         name: 'Luxe',
-        priceFrom: 600000, // TODO
         covers: 'Large events of 300+ guests',
         features: [
           'Full venue transformation',

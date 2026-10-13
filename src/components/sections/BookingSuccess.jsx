@@ -26,15 +26,17 @@ export default function BookingSuccess({ whatsappHref, mailtoHref, onReset }) {
       <Button variant="secondary" icon={RotateCcw} onClick={onReset} className="mt-4 w-full sm:w-auto">
         Start a new request
       </Button>
-      <p className="mt-6 text-sm text-espresso/70">
-        Prefer email?{' '}
-        <a
-          href={mailtoHref}
-          className="inline-flex min-h-11 items-center rounded-full font-semibold text-navy underline underline-offset-4 hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
-        >
-          Send this request by email
-        </a>
-      </p>
+      {mailtoHref && (
+        <p className="mt-6 text-sm text-espresso/70">
+          Prefer email?{' '}
+          <a
+            href={mailtoHref}
+            className="inline-flex min-h-11 items-center rounded-full font-semibold text-navy underline underline-offset-4 hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          >
+            Send this request by email
+          </a>
+        </p>
+      )}
     </div>
   )
 }

@@ -13,7 +13,7 @@ src/
   components/layout/    Navbar, Footer, FloatingWhatsApp
   components/sections/  Hero, Services, Gallery, Packages, Testimonials, Booking
   components/ui/        Container, Button, SectionHeading, SmartImage
-  data/                 site.js (contact, WhatsApp, hours, socials, currency), services.js,
+  data/                 site.js (contact, WhatsApp, locations, hours, socials, academy), services.js,
                         gallery.js, packages.js, testimonials.js, stats.js
   App.jsx  main.jsx  index.css
 public/images/          local images (placeholders until real photos arrive)

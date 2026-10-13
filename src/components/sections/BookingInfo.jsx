@@ -1,5 +1,6 @@
 import { Clock } from 'lucide-react'
 import { bookingIntro, bookingSteps } from '../../data/booking'
+import LocationList from '../ui/LocationList'
 import SectionHeading from '../ui/SectionHeading'
 import WhatsAppLink from '../ui/WhatsAppLink'
 
@@ -32,6 +33,9 @@ export default function BookingInfo() {
       <WhatsAppLink message={bookingIntro.whatsappGreeting} className="mt-6 w-full sm:w-auto">
         Chat on WhatsApp
       </WhatsAppLink>
+
+      <h3 className="mt-10 text-lg font-semibold">Visit us</h3>
+      <LocationList className="mt-4" />
     </div>
   )
 }

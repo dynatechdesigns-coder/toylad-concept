@@ -7,7 +7,7 @@ export const galleryCategories = [
 ]
 
 // Images are Pixabay stock placeholders (see IMAGE-CREDITS.md).
-// TODO: swap in real Toylad Concept photos and confirm all prices.
+// TODO: swap in real Toylad Concept photos.
 const gallery = [
   {
     id: 'ivory-wedding-cake',
@@ -15,7 +15,6 @@ const gallery = [
     category: 'cakes',
     image: '/images/gallery/ivory-wedding-cake.jpg',
     description: 'Four tiers of vanilla sponge with sugar florals and hand-piped pearl detailing.',
-    priceFrom: 180000, // TODO
   },
   {
     id: 'gold-drip-birthday-cake',
@@ -23,7 +22,6 @@ const gallery = [
     category: 'cakes',
     image: '/images/gallery/gold-drip-birthday-cake.jpg',
     description: 'Rich chocolate layers finished with a gold drip, macarons and fresh berries.',
-    priceFrom: 45000, // TODO
   },
   {
     id: 'floral-buttercream-cake',
@@ -31,7 +29,6 @@ const gallery = [
     category: 'cakes',
     image: '/images/gallery/floral-buttercream-cake.jpg',
     description: 'Soft pastel buttercream with a garden of hand-piped flowers, ideal for showers.',
-    priceFrom: 38000, // TODO
   },
   {
     id: 'character-kids-cake',
@@ -39,7 +36,6 @@ const gallery = [
     category: 'cakes',
     image: '/images/gallery/character-kids-cake.jpg',
     description: 'A sculpted fondant cake built around your little one’s favourite character.',
-    priceFrom: 55000, // TODO
   },
   {
     id: 'signature-cupcakes',
@@ -47,7 +43,6 @@ const gallery = [
     category: 'pastries',
     image: '/images/gallery/signature-cupcakes.jpg',
     description: 'Twelve cupcakes in your choice of flavours, topped with swirled buttercream.',
-    priceFrom: 12000, // TODO
   },
   {
     id: 'small-chops-platter',
@@ -55,7 +50,6 @@ const gallery = [
     category: 'pastries',
     image: '/images/gallery/small-chops-platter.jpg',
     description: 'Puff-puff, samosas, spring rolls and more, freshly made for your guests.',
-    priceFrom: 25000, // TODO
   },
   {
     id: 'dessert-table-treats',
@@ -63,7 +57,6 @@ const gallery = [
     category: 'pastries',
     image: '/images/gallery/dessert-table-treats.jpg',
     description: 'Cake pops, tarts, doughnuts and parfaits styled to match your event colours.',
-    priceFrom: 60000, // TODO
   },
   {
     id: 'blush-wedding-backdrop',
@@ -71,7 +64,6 @@ const gallery = [
     category: 'decor',
     image: '/images/gallery/blush-wedding-backdrop.jpg',
     description: 'A floral arch and draped backdrop in blush, ivory and gold for the couple’s stage.',
-    priceFrom: 250000, // TODO
   },
   {
     id: 'birthday-balloon-garland',
@@ -79,7 +71,6 @@ const gallery = [
     category: 'decor',
     image: '/images/gallery/birthday-balloon-garland.jpg',
     description: 'An organic balloon garland with neon signage, sized to fit your space.',
-    priceFrom: 80000, // TODO
   },
   {
     id: 'banquet-table-styling',
@@ -87,7 +78,6 @@ const gallery = [
     category: 'decor',
     image: '/images/gallery/banquet-table-styling.jpg',
     description: 'Centrepieces, linen, charger plates and candlelight for an elegant dinner setting.',
-    priceFrom: 150000, // TODO
   },
   {
     id: 'garden-wedding-coordination',

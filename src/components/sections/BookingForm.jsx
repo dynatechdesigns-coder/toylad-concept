@@ -93,15 +93,17 @@ export default function BookingForm({ bookingPreset }) {
       <Button type="submit" size="lg" icon={Send} className="mt-8 w-full">
         Send request on WhatsApp
       </Button>
-      <p className="mt-4 text-center text-sm text-espresso/70">
-        Prefer email?{' '}
-        <a
-          href={mailtoHref}
-          className="inline-flex min-h-11 items-center rounded-full font-semibold text-navy underline underline-offset-4 hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
-        >
-          Send these details by email
-        </a>
-      </p>
+      {mailtoHref && (
+        <p className="mt-4 text-center text-sm text-espresso/70">
+          Prefer email?{' '}
+          <a
+            href={mailtoHref}
+            className="inline-flex min-h-11 items-center rounded-full font-semibold text-navy underline underline-offset-4 hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          >
+            Send these details by email
+          </a>
+        </p>
+      )}
     </form>
   )
 }

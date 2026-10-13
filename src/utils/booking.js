@@ -84,7 +84,9 @@ export function buildBookingMessage(values, { bold = true } = {}) {
   return [`${mark}New enquiry for ${site.name}${mark}`, '', ...lines].join('\n')
 }
 
+// Null while no email address is set, so callers can hide their email links.
 export function bookingMailto(values) {
+  if (!site.email) return null
   const subject = encodeURIComponent(`Enquiry from ${values.name.trim() || 'the website'}`)
   const body = encodeURIComponent(buildBookingMessage(values, { bold: false }))
   return `mailto:${site.email}?subject=${subject}&body=${body}`

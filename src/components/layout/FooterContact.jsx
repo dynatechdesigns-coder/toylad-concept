@@ -1,14 +1,15 @@
-import { Clock, Mail, MapPin, Phone } from 'lucide-react'
+import { Clock, Mail, Phone } from 'lucide-react'
 import site from '../../data/site'
+import LocationList from '../ui/LocationList'
 
 const heading = 'font-sans text-sm font-semibold uppercase tracking-widest text-cream'
 const link =
   'inline-flex min-h-11 items-center gap-3 rounded-full text-cream/80 transition duration-300 ease-out decoration-butter underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-butter motion-reduce:transition-none'
 
 const contactLinks = [
-  { label: site.phone, href: `tel:${site.phone.replace(/[^\d+]/g, '')}`, icon: Phone },
-  { label: site.email, href: `mailto:${site.email}`, icon: Mail },
-]
+  { label: site.phone, href: `tel:+${site.whatsappNumber}`, icon: Phone },
+  site.email && { label: site.email, href: `mailto:${site.email}`, icon: Mail },
+].filter(Boolean)
 
 export default function FooterContact() {
   return (
@@ -24,11 +25,8 @@ export default function FooterContact() {
               </a>
             </li>
           ))}
-          <li className="flex items-start gap-3 py-2.5 text-cream/80">
-            <MapPin className="mt-1 size-4 shrink-0 text-butter" aria-hidden="true" />
-            <address className="not-italic">{site.address}</address>
-          </li>
         </ul>
+        <LocationList tone="dark" className="mt-2" />
       </div>
 
       <div>
