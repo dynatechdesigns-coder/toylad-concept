@@ -5,7 +5,8 @@ import PhotoActions from './PhotoActions'
 
 const pill = 'rounded-full bg-butter px-3 py-1 text-sm font-semibold text-espresso'
 
-export default function PhotoCard({ photo, categoryLabel, isFirst, isLast, busy, onFeature, onToggle, onEdit, onMove, onDelete }) {
+// `overLimit`: visible, but past the number of photos its category shows on the website.
+export default function PhotoCard({ photo, categoryLabel, overLimit, isFirst, isLast, busy, onFeature, onToggle, onEdit, onMove, onDelete }) {
   const VisibilityIcon = photo.published ? Eye : EyeOff
 
   return (
@@ -29,7 +30,12 @@ export default function PhotoCard({ photo, categoryLabel, isFirst, isLast, busy,
       </div>
 
       <div className="p-4 md:p-6">
-        <h3 className="break-words text-xl font-semibold">{photo.title}</h3>
+        <h4 className="break-words text-xl font-semibold">{photo.title}</h4>
+        {overLimit && (
+          <p className="mt-2 rounded-2xl bg-butter-soft px-3 py-2 text-sm font-medium text-espresso">
+            Saved, but not showing on the website yet. Move it up, or hide an older photo.
+          </p>
+        )}
 
         <button
           type="button"

@@ -4,12 +4,14 @@ const site = {
   phone: '0816 155 6766',
   whatsappNumber: '2348161556766', // international format, digits only; also used for tel: links
   email: '', // TODO: add an email address (email links stay hidden while this is empty)
+  // `label` is the heading shown wherever the address is listed; `name` is an optional line under it.
   locations: [
-    { id: 'shop', name: 'Shop', address: 'Mini Football Field, Jikwoyi, Abuja' },
+    { id: 'shop', label: 'Shop', address: 'By Mini Football Field, Jikwoyi, Abuja.' },
     {
-      id: 'academy',
-      name: 'Toylad Concept Cakes & Pastries Academy',
-      address: 'By Bikaja Plaza, SS Quarters, Jikwoyi, Abuja',
+      id: 'school',
+      label: 'Training School',
+      name: 'Toylad Concept (Cakes & Pastries Academy)',
+      address: 'By Bikaja Plaza, SS Quarters, Jikwoyi, Abuja.',
     },
   ],
   hours: [
@@ -32,9 +34,8 @@ const site = {
   priceNote: 'Friendly price on request',
   academy: {
     eyebrow: 'Learn with us',
-    title: 'Toylad Concept Cakes & Pastries Academy',
     text: 'Learn baking and pastry with us.',
-    locationId: 'academy',
+    locationId: 'school', // its name is the section title; its address is listed underneath
     cta: 'Ask about classes',
     whatsappMessage:
       'Hello Toylad Concept! I would like to ask about classes at the Cakes & Pastries Academy. Please share the details.',

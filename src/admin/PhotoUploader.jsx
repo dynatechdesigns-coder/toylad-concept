@@ -54,11 +54,15 @@ export default function PhotoUploader({ onUploaded, onSessionExpired, onProblem,
       <p className="mt-3 text-center text-base text-espresso/75">You can choose several photos at once.</p>
 
       <div aria-live="polite">
-        {message && (
-          <p className="mt-6 flex items-center gap-3 rounded-3xl bg-teal p-4 text-lg font-semibold text-white">
-            <CircleCheck className="size-6 shrink-0" aria-hidden="true" />
-            {message}
-          </p>
+        {message.length > 0 && (
+          <div className="mt-6 flex items-start gap-3 rounded-3xl bg-teal p-4 text-lg font-semibold text-white">
+            <CircleCheck className="mt-0.5 size-6 shrink-0" aria-hidden="true" />
+            <div className="space-y-2">
+              {message.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 

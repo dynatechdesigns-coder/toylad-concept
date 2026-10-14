@@ -1,7 +1,7 @@
 import { Suspense, lazy, useMemo, useState } from 'react'
 import stockPhotos, { galleryCategories, showStockPhotos } from '../../data/gallery'
 import useUploadedPhotos from '../../hooks/useUploadedPhotos'
-import { PAGE_SIZE, buildGallery } from '../../utils/gallery'
+import { buildGallery } from '../../utils/gallery'
 import Container from '../ui/Container'
 import SectionHeading from '../ui/SectionHeading'
 import Tabs from '../ui/Tabs'
@@ -15,12 +15,11 @@ const categoryById = Object.fromEntries(galleryCategories.map((category) => [cat
 
 export default function Gallery({ setBookingPreset, isOwner, onOwnerSignedOut }) {
   const [filter, setFilter] = useState('all')
-  const [pages, setPages] = useState(1)
   const [openId, setOpenId] = useState(null)
   const { items: uploaded, reload } = useUploadedPhotos()
 
   const view = useMemo(() => buildGallery(uploaded, stockPhotos, showStockPhotos), [uploaded])
-  // Category tabs show their real totals; "All" is a short selection, so it has no count.
+  // Category tabs count the photos they show (at most 8); "All" is a short selection, so it has no count.
   const tabs = useMemo(
     () => [
       { id: 'all', label: 'All' },
@@ -29,18 +28,13 @@ export default function Gallery({ setBookingPreset, isOwner, onOwnerSignedOut })
     [view],
   )
 
-  const pool = filter === 'all' ? view.all : view.byCategory[filter]
-  const items = filter === 'all' ? pool : pool.slice(0, pages * PAGE_SIZE)
+  const items = filter === 'all' ? view.all : view.byCategory[filter]
   const openIndex = items.findIndex((item) => item.id === openId)
   const openItem = items[openIndex]
   const step = (offset) => setOpenId(items[(openIndex + offset + items.length) % items.length].id)
 
-  const changeFilter = (id) => {
-    setFilter(id)
-    setPages(1)
-  }
   const jumpTo = (id) => {
-    changeFilter(id)
+    setFilter(id)
     const tab = document.getElementById(`gallery-tab-${id}`)
     tab?.scrollIntoView({ block: 'center' })
     tab?.focus({ preventScroll: true })
@@ -51,19 +45,13 @@ export default function Gallery({ setBookingPreset, isOwner, onOwnerSignedOut })
       <Tabs
         tabs={tabs}
         value={filter}
-        onChange={changeFilter}
+        onChange={setFilter}
         idPrefix="gallery"
         label="Filter gallery by category"
         className="-mx-4 mt-10 px-4 sm:mx-0 sm:px-1 md:mt-12"
       />
       <GalleryGrid filter={filter} items={items} categoryById={categoryById} onOpen={setOpenId} actionsFor={actionsFor} />
-      <GalleryMore
-        filter={filter}
-        empty={items.length === 0}
-        remaining={pool.length - items.length}
-        onShowMore={() => setPages((count) => count + 1)}
-        onJump={jumpTo}
-      />
+      <GalleryMore filter={filter} empty={items.length === 0} onJump={jumpTo} />
     </>
   )
 

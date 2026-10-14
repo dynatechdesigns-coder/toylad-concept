@@ -4,12 +4,10 @@ import SectionHeading from '../components/ui/SectionHeading'
 import { galleryCategories } from '../data/gallery'
 import { ALL_LIMIT } from '../utils/gallery'
 import HealthPanel from './HealthPanel'
-import PhotoCard from './PhotoCard'
+import PhotoCategoryGroup from './PhotoCategoryGroup'
 import PhotoDialogs from './PhotoDialogs'
 import PhotoUploader from './PhotoUploader'
 import usePhotos from './usePhotos'
-
-const categoryLabels = Object.fromEntries(galleryCategories.map((category) => [category.id, category.label]))
 
 export default function AdminPhotos({ onSessionExpired }) {
   // Counts errors: each one shows the connection check again with fresh results.
@@ -18,6 +16,14 @@ export default function AdminPhotos({ onSessionExpired }) {
   const { photos, error, busy, add, update, remove, move } = usePhotos({ onSessionExpired, onProblem })
   // { type: 'edit' | 'delete', photo } while a dialog is open.
   const [dialog, setDialog] = useState(null)
+
+  const actions = {
+    feature: (photo) => update(photo.id, { featured: !photo.featured }),
+    toggle: (photo) => update(photo.id, { published: !photo.published }),
+    edit: (photo) => setDialog({ type: 'edit', photo }),
+    move: (photo, offset) => move(photo.id, offset),
+    remove: (photo) => setDialog({ type: 'delete', photo }),
+  }
 
   return (
     <>
@@ -34,11 +40,11 @@ export default function AdminPhotos({ onSessionExpired }) {
       {problems > 0 && <HealthPanel key={problems} />}
 
       <section aria-labelledby="your-photos-title" className="mt-12 md:mt-16">
-        <h2 id="your-photos-title" className="text-xl font-semibold md:text-2xl">
+        <h2 id="your-photos-title" className="text-3xl font-semibold">
           Your photos
         </h2>
         <p className="mt-2 text-base leading-relaxed text-espresso/75 md:text-lg">
-          The first photo here shows first on the website. Use Move up and Move down to change the order.
+          In each group, the first photo shows first on the website. Use Move up and Move down to change the order.
         </p>
         <p className="mt-4 flex items-start gap-3 rounded-3xl bg-butter-soft p-4 text-base text-espresso">
           <Star className="mt-0.5 size-5 shrink-0 fill-butter text-terracotta-deep" aria-hidden="true" />
@@ -58,25 +64,16 @@ export default function AdminPhotos({ onSessionExpired }) {
           </p>
         )}
 
-        {photos?.length > 0 && (
-          <ul className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">
-            {photos.map((photo, index) => (
-              <PhotoCard
-                key={photo.id}
-                photo={photo}
-                categoryLabel={categoryLabels[photo.category] ?? photo.category}
-                isFirst={index === 0}
-                isLast={index === photos.length - 1}
-                busy={busy}
-                onFeature={() => update(photo.id, { featured: !photo.featured })}
-                onToggle={() => update(photo.id, { published: !photo.published })}
-                onEdit={() => setDialog({ type: 'edit', photo })}
-                onMove={(offset) => move(photo.id, offset)}
-                onDelete={() => setDialog({ type: 'delete', photo })}
-              />
-            ))}
-          </ul>
-        )}
+        {photos !== null &&
+          galleryCategories.map((category) => (
+            <PhotoCategoryGroup
+              key={category.id}
+              category={category}
+              photos={photos.filter((photo) => photo.category === category.id)}
+              busy={busy}
+              actions={actions}
+            />
+          ))}
       </section>
 
       <PhotoDialogs dialog={dialog} busy={busy} error={error} onUpdate={update} onRemove={remove} onClose={() => setDialog(null)} />

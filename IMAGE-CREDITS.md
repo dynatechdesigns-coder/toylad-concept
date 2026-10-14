@@ -22,9 +22,6 @@ All photos below are stock placeholders from Pixabay (Pixabay Content License), 
 
 | File (in `public/images/gallery/`) | Shows                                        | Photographer       | Source  | Link |
 |------------------------------------|----------------------------------------------|--------------------|---------|------|
-| `ivory-wedding-cake.jpg`           | Four-tier white wedding cake                 | jeremywongweddings | Pixabay | https://pixabay.com/photos/wedding-cake-wedding-cakes-food-3346747/ |
-| `gold-drip-birthday-cake.jpg`      | Caramel drip layer cake                      | alyerika           | Pixabay | https://pixabay.com/photos/caramel-cake-celebration-cake-10191380/ |
-| `floral-buttercream-cake.jpg`      | Pastel buttercream cake with sprinkles       | JillWellington     | Pixabay | https://pixabay.com/photos/cake-dessert-birthday-cake-6591719/ |
 | `character-kids-cake.jpg`          | Colourful drip cake with doughnuts           | imazite            | Pixabay | https://pixabay.com/photos/cake-food-dessert-delicious-baking-3669245/ |
 | `signature-cupcakes.jpg`           | Assorted cupcakes from above                 | ninita_7           | Pixabay | https://pixabay.com/photos/cake-pastries-muffin-dessert-4674617/ |
 | `small-chops-platter.jpg`          | Tiered stand of pastries and finger food     | alinemais          | Pixabay | https://pixabay.com/photos/food-table-party-sandwich-lunch-680180/ |

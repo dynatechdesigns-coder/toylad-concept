@@ -67,8 +67,9 @@ Errors come back as JSON: `{ "error": "message" }`.
 ## Gallery rules
 
 - **All tab:** at most 10 photos. The owner's starred ("Feature on All") photos come first in her order, then her newest photos.
-- **Category tabs:** 12 photos at first, then 12 more per "Show more". Each tab shows its real photo count.
-- **Stock photos:** they fill the gallery until the owner has 10 published photos of her own, then stop showing. To hide them sooner, set `showStockPhotos` to `false` in `src/data/gallery.js`.
+- **Category tabs:** at most 8 photos each, in the owner's order. The tab count is the number shown. Extra photos stay saved and show once she moves them up or hides an older one.
+- **Stock photos:** in each category they only fill the spots the owner has not filled yet. To hide them completely, set `showStockPhotos` to `false` in `src/data/gallery.js`.
+- **New uploads** join the end of their category, so they never push an older photo off the website.
 - The numbers live in `src/utils/gallery.js`.
 
 ## Owner mode

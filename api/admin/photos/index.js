@@ -39,8 +39,8 @@ export default route(
       if (await photos.findOne({ publicId: upload.public_id })) {
         throw new HttpError(409, 'That photo has already been added.')
       }
-      // New photos go to the front: one place before the current first photo.
-      const [first] = await photos.find({}).sort({ order: 1 }).limit(1).toArray()
+      // New photos go to the end, so they never push an older photo off the website.
+      const [last] = await photos.find({}).sort({ order: -1 }).limit(1).toArray()
       const now = new Date()
       const doc = {
         published: true,
@@ -50,7 +50,7 @@ export default route(
         publicId: upload.public_id,
         width: upload.width,
         height: upload.height,
-        order: first ? first.order - 1 : 0,
+        order: last ? last.order + 1 : 0,
         createdAt: now,
         updatedAt: now,
       }

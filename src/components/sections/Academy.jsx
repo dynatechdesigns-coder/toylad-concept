@@ -18,12 +18,14 @@ export default function Academy() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold uppercase tracking-widest text-terracotta-deep">{academy.eyebrow}</p>
             <h2 id="academy-title" className="mt-2 text-xl font-semibold md:text-2xl">
-              {academy.title}
+              {location.name}
             </h2>
             <p className="mt-2 text-base leading-relaxed text-espresso/75">{academy.text}</p>
             <p className="mt-3 flex items-start gap-2 text-sm text-espresso/75">
               <MapPin className="mt-0.5 size-4 shrink-0 text-teal" aria-hidden="true" />
-              <span>{location.address}</span>
+              <span>
+                <span className="font-semibold text-espresso">{location.label}:</span> {location.address}
+              </span>
             </p>
           </div>
 

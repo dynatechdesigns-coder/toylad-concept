@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { uploadPhoto } from './api'
+import { limitNote } from './limits'
 
 const successMessage = (count) =>
   count === 1 ? 'Your photo is now on the website.' : `Your ${count} photos are now on the website.`
@@ -8,7 +9,8 @@ const successMessage = (count) =>
 export default function usePhotoDrafts({ onUploaded, onSessionExpired, onProblem }) {
   const [drafts, setDrafts] = useState([])
   const [publishing, setPublishing] = useState(false)
-  const [message, setMessage] = useState('')
+  // Lines of the message shown after publishing: successes, then any "over the limit" notes.
+  const [message, setMessage] = useState([])
   const nextId = useRef(1)
 
   const patch = (id, changes) =>
@@ -28,7 +30,7 @@ export default function usePhotoDrafts({ onUploaded, onSessionExpired, onProblem
         failure: '',
       }))
     if (picked.length === 0) return
-    setMessage('')
+    setMessage([])
     setDrafts((current) => [...current, ...picked])
   }
 
@@ -56,11 +58,13 @@ export default function usePhotoDrafts({ onUploaded, onSessionExpired, onProblem
       },
     }))
     setDrafts(checked)
-    setMessage('')
+    setMessage([])
     if (checked.some((draft) => draft.errors.title || draft.errors.category)) return
 
     setPublishing(true)
     let published = 0
+    let savedOnly = 0
+    const notes = new Set()
     for (const draft of checked) {
       patch(draft.id, { progress: 0 })
       try {
@@ -68,9 +72,14 @@ export default function usePhotoDrafts({ onUploaded, onSessionExpired, onProblem
           { file: draft.file, title: draft.title.trim(), category: draft.category },
           (progress) => patch(draft.id, { progress }),
         )
-        onUploaded(photo)
+        // `overLimit`: the photo is saved, but its category already shows its full set.
+        if (onUploaded(photo)?.overLimit) {
+          savedOnly += 1
+          notes.add(limitNote(photo.category))
+        } else {
+          published += 1
+        }
         remove(draft.id)
-        published += 1
       } catch (problem) {
         if (problem.status === 401) {
           onSessionExpired()
@@ -81,7 +90,10 @@ export default function usePhotoDrafts({ onUploaded, onSessionExpired, onProblem
       }
     }
     setPublishing(false)
-    if (published > 0) setMessage(successMessage(published))
+    setMessage([
+      ...(published > 0 ? [successMessage(published)] : []),
+      ...(savedOnly > 0 ? [savedOnly === 1 ? 'Your photo is saved.' : `Your ${savedOnly} photos are saved.`, ...notes] : []),
+    ])
   }
 
   return { drafts, publishing, message, addFiles, remove, change, publish }

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { CATEGORY_LIMIT } from '../utils/gallery'
 import { deletePhoto, listPhotos, updatePhoto } from './api'
 
 // The owner's photos in website order, plus the actions to change them.
@@ -7,6 +8,13 @@ export default function usePhotos({ onSessionExpired, onProblem, onChanged }) {
   const [photos, setPhotos] = useState(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  // Always the latest list, so several uploads in a row each see the ones before them.
+  const latest = useRef(null)
+
+  const setList = (next) => {
+    latest.current = next
+    setPhotos(next)
+  }
 
   const fail = (problem) => {
     if (problem.status === 401) return onSessionExpired()
@@ -16,9 +24,9 @@ export default function usePhotos({ onSessionExpired, onProblem, onChanged }) {
 
   const load = () =>
     listPhotos()
-      .then((data) => setPhotos(data.photos))
+      .then((data) => setList(data.photos))
       .catch((problem) => {
-        setPhotos((current) => current ?? [])
+        setList(latest.current ?? [])
         fail(problem)
       })
 
@@ -43,36 +51,43 @@ export default function usePhotos({ onSessionExpired, onProblem, onChanged }) {
     }
   }
 
+  // New photos join the end of the list. `overLimit` says its category was already full on the website.
   const add = (photo) => {
-    setPhotos((current) => [photo, ...(current ?? [])])
+    const list = latest.current ?? []
+    const showing = list.filter((item) => item.published && item.category === photo.category).length
+    setList([...list, photo])
     onChanged?.()
+    return { overLimit: photo.published && showing >= CATEGORY_LIMIT }
   }
 
   const update = (id, changes) =>
     run(async () => {
       const { photo } = await updatePhoto(id, changes)
-      setPhotos((current) => current.map((item) => (item.id === id ? photo : item)))
+      setList(latest.current.map((item) => (item.id === id ? photo : item)))
     })
 
   const remove = (id) =>
     run(async () => {
       await deletePhoto(id)
-      setPhotos((current) => current.filter((item) => item.id !== id))
+      setList(latest.current.filter((item) => item.id !== id))
     })
 
-  // Swaps the photo with its neighbour, then saves every position that changed.
+  // Swaps the photo with the next one of the same category, then saves every position that changed.
   const move = (id, offset) =>
     run(async () => {
-      const from = photos.findIndex((item) => item.id === id)
-      const to = from + offset
-      if (from < 0 || to < 0 || to >= photos.length) return
+      const list = latest.current
+      const from = list.findIndex((item) => item.id === id)
+      if (from < 0) return
+      let to = from + offset
+      while (list[to] && list[to].category !== list[from].category) to += offset
+      if (!list[to]) return
 
-      const reordered = [...photos]
+      const reordered = [...list]
       ;[reordered[from], reordered[to]] = [reordered[to], reordered[from]]
-      const changed = reordered.filter((item, index) => item.order !== index)
-      setPhotos(reordered.map((item, index) => ({ ...item, order: index })))
+      const changed = reordered.map((item, order) => ({ id: item.id, order })).filter(({ order }, index) => reordered[index].order !== order)
+      setList(reordered.map((item, order) => ({ ...item, order })))
       try {
-        await Promise.all(changed.map((item) => updatePhoto(item.id, { order: reordered.indexOf(item) })))
+        await Promise.all(changed.map(({ id: photoId, order }) => updatePhoto(photoId, { order })))
       } catch (problem) {
         await load()
         throw problem

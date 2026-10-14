@@ -6,35 +6,14 @@ export const galleryCategories = [
   { id: 'planning', label: 'Event Planning', service: 'event-management' },
 ]
 
-// Photos the owner uploads at /admin always show first. The stock photos below fill the gallery only
-// until she has 10 photos of her own (OWN_PHOTOS_TARGET in utils/gallery.js). Set this to false to hide
-// the stock photos now, however many she has.
+// Photos the owner uploads at /admin always show first. Each category shows at most 8 photos
+// (CATEGORY_LIMIT in utils/gallery.js); the stock photos below only fill the spots she has not filled yet.
+// Set this to false to hide the stock photos completely.
 export const showStockPhotos = true
 
 // Images are Pixabay stock placeholders (see IMAGE-CREDITS.md).
 // TODO: swap in real Toylad Concept photos.
 const gallery = [
-  {
-    id: 'ivory-wedding-cake',
-    title: 'Ivory Tiered Wedding Cake',
-    category: 'cakes',
-    image: '/images/gallery/ivory-wedding-cake.jpg',
-    description: 'Four tiers of vanilla sponge with sugar florals and hand-piped pearl detailing.',
-  },
-  {
-    id: 'gold-drip-birthday-cake',
-    title: 'Gold Drip Birthday Cake',
-    category: 'cakes',
-    image: '/images/gallery/gold-drip-birthday-cake.jpg',
-    description: 'Rich chocolate layers finished with a gold drip, macarons and fresh berries.',
-  },
-  {
-    id: 'floral-buttercream-cake',
-    title: 'Floral Buttercream Cake',
-    category: 'cakes',
-    image: '/images/gallery/floral-buttercream-cake.jpg',
-    description: 'Soft pastel buttercream with a garden of hand-piped flowers, ideal for showers.',
-  },
   {
     id: 'character-kids-cake',
     title: 'Character Cake for Kids',

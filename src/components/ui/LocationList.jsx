@@ -5,13 +5,13 @@ import { mapsUrl } from '../../utils/format'
 // `tone` matches the background: "light" = cream, "dark" = navy.
 const tones = {
   light: {
-    name: 'text-espresso',
+    label: 'text-espresso',
     address: 'text-espresso/75',
     icon: 'text-teal',
     link: 'text-teal hover:text-navy focus-visible:ring-teal',
   },
   dark: {
-    name: 'text-cream',
+    label: 'text-cream',
     address: 'text-cream/70',
     icon: 'text-butter',
     link: 'text-cream decoration-butter hover:text-white focus-visible:ring-butter',
@@ -23,12 +23,15 @@ export default function LocationList({ tone = 'light', className = '' }) {
 
   return (
     <ul className={`space-y-4 ${className}`}>
-      {site.locations.map(({ id, name, address }) => (
+      {site.locations.map(({ id, label, name, address }) => (
         <li key={id} className="flex items-start gap-3">
           <MapPin className={`mt-1 size-4 shrink-0 ${styles.icon}`} aria-hidden="true" />
           <div>
-            <p className={`font-medium ${styles.name}`}>{name}</p>
-            <address className={`text-sm not-italic ${styles.address}`}>{address}</address>
+            <p className={`font-medium ${styles.label}`}>{label}</p>
+            <address className={`text-sm not-italic ${styles.address}`}>
+              {name && <span className="block">{name}</span>}
+              {address}
+            </address>
             <a
               href={mapsUrl(address)}
               target="_blank"
@@ -38,7 +41,7 @@ export default function LocationList({ tone = 'light', className = '' }) {
               Get directions
               <span className="sr-only">
                 {' '}
-                to {name} (opens in a new tab)
+                to the {label} (opens in a new tab)
               </span>
             </a>
           </div>

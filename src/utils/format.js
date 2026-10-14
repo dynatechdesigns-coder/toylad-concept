@@ -9,5 +9,6 @@ export function whatsappUrl(message) {
 }
 
 export function mapsUrl(address) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+  // Addresses are written as sentences; the search works better without the final full stop.
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address.replace(/\.$/, ''))}`
 }
