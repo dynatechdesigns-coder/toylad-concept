@@ -30,7 +30,7 @@ export default route(
     async POST(req, res) {
       const body = readJson(req)
       const fields = validatePhotoFields(body, {
-        allowed: ['title', 'category', 'published', 'publicId'],
+        allowed: ['title', 'category', 'published', 'featured', 'publicId'],
         required: ['title', 'category'],
       })
       const upload = await findUpload(body.publicId)
@@ -44,6 +44,7 @@ export default route(
       const now = new Date()
       const doc = {
         published: true,
+        featured: false,
         ...fields,
         imageUrl: upload.secure_url,
         publicId: upload.public_id,

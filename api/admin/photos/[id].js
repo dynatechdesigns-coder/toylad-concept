@@ -8,7 +8,7 @@ export default route(
   {
     async PATCH(req) {
       const _id = parsePhotoId(req.query.id)
-      const fields = validatePhotoFields(readJson(req), { allowed: ['title', 'category', 'published', 'order'] })
+      const fields = validatePhotoFields(readJson(req), { allowed: ['title', 'category', 'published', 'featured', 'order'] })
       if (Object.keys(fields).length === 0) throw new HttpError(400, 'Nothing to change.')
 
       const photos = await photosCollection()

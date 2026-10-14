@@ -7,7 +7,7 @@ export default function GalleryCard({ item, categoryLabel, aspect, onOpen }) {
       type="button"
       onClick={onOpen}
       aria-label={`View ${item.title}`}
-      className="group relative mb-6 block w-full animate-pop-in break-inside-avoid overflow-hidden rounded-2xl text-left shadow-sm transition duration-300 ease-out hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 focus-visible:ring-offset-cream motion-reduce:transition-none md:mb-8"
+      className="group relative block w-full animate-pop-in overflow-hidden rounded-2xl text-left shadow-sm transition duration-300 ease-out hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 focus-visible:ring-offset-cream motion-reduce:transition-none"
     >
       <SmartImage
         src={item.image}

@@ -20,11 +20,13 @@ export function toPublicPhoto(doc) {
     imageUrl: doc.imageUrl,
     width: doc.width,
     height: doc.height,
+    featured: doc.featured === true,
+    createdAt: doc.createdAt,
   }
 }
 
 export function toAdminPhoto(doc) {
-  return { ...toPublicPhoto(doc), published: doc.published, order: doc.order, createdAt: doc.createdAt }
+  return { ...toPublicPhoto(doc), published: doc.published, order: doc.order }
 }
 
 export function parsePhotoId(value) {
@@ -45,6 +47,10 @@ const validators = {
   },
   published(value) {
     if (typeof value !== 'boolean') throw new HttpError(400, '"published" must be true or false.')
+    return value
+  },
+  featured(value) {
+    if (typeof value !== 'boolean') throw new HttpError(400, '"featured" must be true or false.')
     return value
   },
   order(value) {

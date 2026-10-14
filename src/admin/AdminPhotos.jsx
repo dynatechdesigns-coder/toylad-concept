@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { Star } from 'lucide-react'
+import SectionHeading from '../components/ui/SectionHeading'
 import { galleryCategories } from '../data/gallery'
-import ConfirmDeleteDialog from './ConfirmDeleteDialog'
+import { ALL_LIMIT } from '../utils/gallery'
 import HealthPanel from './HealthPanel'
 import PhotoCard from './PhotoCard'
-import PhotoEditDialog from './PhotoEditDialog'
+import PhotoDialogs from './PhotoDialogs'
 import PhotoUploader from './PhotoUploader'
 import usePhotos from './usePhotos'
 
@@ -17,21 +19,30 @@ export default function AdminPhotos({ onSessionExpired }) {
   // { type: 'edit' | 'delete', photo } while a dialog is open.
   const [dialog, setDialog] = useState(null)
 
-  const closeAfter = async (action) => {
-    if (await action) setDialog(null)
-  }
-
   return (
     <>
-      <PhotoUploader onUploaded={add} onSessionExpired={onSessionExpired} onProblem={onProblem} />
+      <SectionHeading
+        align="left"
+        eyebrow="Owner area"
+        title="Your gallery photos"
+        subtitle="Add new photos here. They appear on the website straight away."
+      />
+
+      <div className="mt-8">
+        <PhotoUploader onUploaded={add} onSessionExpired={onSessionExpired} onProblem={onProblem} />
+      </div>
       {problems > 0 && <HealthPanel key={problems} />}
 
-      <section aria-labelledby="your-photos-title" className="mt-12">
-        <h2 id="your-photos-title" className="text-3xl font-semibold">
+      <section aria-labelledby="your-photos-title" className="mt-12 md:mt-16">
+        <h2 id="your-photos-title" className="text-xl font-semibold md:text-2xl">
           Your photos
         </h2>
-        <p className="mt-2 text-base text-espresso/75 md:text-lg">
+        <p className="mt-2 text-base leading-relaxed text-espresso/75 md:text-lg">
           The first photo here shows first on the website. Use Move up and Move down to change the order.
+        </p>
+        <p className="mt-4 flex items-start gap-3 rounded-3xl bg-butter-soft p-4 text-base text-espresso">
+          <Star className="mt-0.5 size-5 shrink-0 fill-butter text-terracotta-deep" aria-hidden="true" />
+          Up to {ALL_LIMIT} photos appear under “All”. Tap the star to choose which ones.
         </p>
 
         {error && (
@@ -48,7 +59,7 @@ export default function AdminPhotos({ onSessionExpired }) {
         )}
 
         {photos?.length > 0 && (
-          <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid gap-6 sm:grid-cols-2 md:gap-8 lg:grid-cols-3">
             {photos.map((photo, index) => (
               <PhotoCard
                 key={photo.id}
@@ -57,6 +68,7 @@ export default function AdminPhotos({ onSessionExpired }) {
                 isFirst={index === 0}
                 isLast={index === photos.length - 1}
                 busy={busy}
+                onFeature={() => update(photo.id, { featured: !photo.featured })}
                 onToggle={() => update(photo.id, { published: !photo.published })}
                 onEdit={() => setDialog({ type: 'edit', photo })}
                 onMove={(offset) => move(photo.id, offset)}
@@ -67,24 +79,7 @@ export default function AdminPhotos({ onSessionExpired }) {
         )}
       </section>
 
-      {dialog?.type === 'edit' && (
-        <PhotoEditDialog
-          photo={dialog.photo}
-          busy={busy}
-          error={error}
-          onSave={(changes) => closeAfter(update(dialog.photo.id, changes))}
-          onClose={() => setDialog(null)}
-        />
-      )}
-      {dialog?.type === 'delete' && (
-        <ConfirmDeleteDialog
-          photo={dialog.photo}
-          busy={busy}
-          error={error}
-          onConfirm={() => closeAfter(remove(dialog.photo.id))}
-          onClose={() => setDialog(null)}
-        />
-      )}
+      <PhotoDialogs dialog={dialog} busy={busy} error={error} onUpdate={update} onRemove={remove} onClose={() => setDialog(null)} />
     </>
   )
 }

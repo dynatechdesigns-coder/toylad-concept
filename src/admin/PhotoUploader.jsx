@@ -14,7 +14,8 @@ function onPick(addFiles) {
   }
 }
 
-export default function PhotoUploader({ onUploaded, onSessionExpired, onProblem }) {
+// `stacked` keeps everything in one column, for narrow places such as a dialog.
+export default function PhotoUploader({ onUploaded, onSessionExpired, onProblem, stacked = false }) {
   const { drafts, publishing, message, addFiles, remove, change, publish } = usePhotoDrafts({
     onUploaded,
     onSessionExpired,
@@ -29,7 +30,7 @@ export default function PhotoUploader({ onUploaded, onSessionExpired, onProblem 
         Add photos
       </h2>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className={`grid gap-3 ${stacked ? '' : 'sm:grid-cols-2'}`}>
         <label className={`${pickerBase} ${idle} bg-terracotta-deep text-white shadow-sm hover:bg-teal hover:shadow-xl`}>
           <ImagePlus className="size-6" aria-hidden="true" />
           Add photo
@@ -70,7 +71,7 @@ export default function PhotoUploader({ onUploaded, onSessionExpired, onProblem 
             publish()
           }}
         >
-          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className={`grid gap-6 ${stacked ? '' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
             {drafts.map((draft, index) => (
               <UploadDraft
                 key={draft.id}

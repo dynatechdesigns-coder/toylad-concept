@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { deletePhoto, listPhotos, updatePhoto } from './api'
 
-// The owner's photos in website order, plus the actions the Photos screen needs.
-export default function usePhotos({ onSessionExpired, onProblem }) {
+// The owner's photos in website order, plus the actions to change them.
+// `onChanged` (optional) runs after every saved change, e.g. to refresh the public gallery.
+export default function usePhotos({ onSessionExpired, onProblem, onChanged }) {
   const [photos, setPhotos] = useState(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -32,6 +33,7 @@ export default function usePhotos({ onSessionExpired, onProblem }) {
     setError('')
     try {
       await action()
+      onChanged?.()
       return true
     } catch (problem) {
       fail(problem)
@@ -41,7 +43,10 @@ export default function usePhotos({ onSessionExpired, onProblem }) {
     }
   }
 
-  const add = (photo) => setPhotos((current) => [photo, ...(current ?? [])])
+  const add = (photo) => {
+    setPhotos((current) => [photo, ...(current ?? [])])
+    onChanged?.()
+  }
 
   const update = (id, changes) =>
     run(async () => {

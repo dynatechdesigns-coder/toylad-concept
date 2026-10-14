@@ -1,39 +1,71 @@
-import { useMemo, useState } from 'react'
-import gallery, { galleryCategories, showStockPhotos } from '../../data/gallery'
+import { Suspense, lazy, useMemo, useState } from 'react'
+import stockPhotos, { galleryCategories, showStockPhotos } from '../../data/gallery'
 import useUploadedPhotos from '../../hooks/useUploadedPhotos'
+import { PAGE_SIZE, buildGallery } from '../../utils/gallery'
 import Container from '../ui/Container'
 import SectionHeading from '../ui/SectionHeading'
 import Tabs from '../ui/Tabs'
-import GalleryCard from './GalleryCard'
+import GalleryGrid from './GalleryGrid'
 import GalleryLightbox from './GalleryLightbox'
+import GalleryMore from './GalleryMore'
 
-const stockPhotos = showStockPhotos ? gallery : []
+// Owner-only tools. Loaded only after the server confirms the owner is logged in.
+const OwnerGalleryTools = lazy(() => import('../../admin/OwnerGalleryTools'))
 const categoryById = Object.fromEntries(galleryCategories.map((category) => [category.id, category]))
-// Cycled by position to give the columns a masonry feel.
-const aspects = ['4 / 5', '1 / 1', '3 / 4', '4 / 3', '1 / 1']
 
-export default function Gallery({ setBookingPreset }) {
+export default function Gallery({ setBookingPreset, isOwner, onOwnerSignedOut }) {
   const [filter, setFilter] = useState('all')
+  const [pages, setPages] = useState(1)
   const [openId, setOpenId] = useState(null)
-  const uploaded = useUploadedPhotos()
+  const { items: uploaded, reload } = useUploadedPhotos()
 
-  // The owner's uploads come first, then the stock photos.
-  const all = useMemo(() => [...uploaded, ...stockPhotos], [uploaded])
+  const view = useMemo(() => buildGallery(uploaded, stockPhotos, showStockPhotos), [uploaded])
+  // Category tabs show their real totals; "All" is a short selection, so it has no count.
   const tabs = useMemo(
     () => [
-      { id: 'all', label: 'All', count: all.length },
-      ...galleryCategories.map((category) => ({
-        id: category.id,
-        label: category.label,
-        count: all.filter((item) => item.category === category.id).length,
-      })),
+      { id: 'all', label: 'All' },
+      ...galleryCategories.map(({ id, label }) => ({ id, label, count: view.byCategory[id].length })),
     ],
-    [all],
+    [view],
   )
-  const items = filter === 'all' ? all : all.filter((item) => item.category === filter)
+
+  const pool = filter === 'all' ? view.all : view.byCategory[filter]
+  const items = filter === 'all' ? pool : pool.slice(0, pages * PAGE_SIZE)
   const openIndex = items.findIndex((item) => item.id === openId)
   const openItem = items[openIndex]
   const step = (offset) => setOpenId(items[(openIndex + offset + items.length) % items.length].id)
+
+  const changeFilter = (id) => {
+    setFilter(id)
+    setPages(1)
+  }
+  const jumpTo = (id) => {
+    changeFilter(id)
+    const tab = document.getElementById(`gallery-tab-${id}`)
+    tab?.scrollIntoView({ block: 'center' })
+    tab?.focus({ preventScroll: true })
+  }
+
+  const renderPhotos = (actionsFor) => (
+    <>
+      <Tabs
+        tabs={tabs}
+        value={filter}
+        onChange={changeFilter}
+        idPrefix="gallery"
+        label="Filter gallery by category"
+        className="-mx-4 mt-10 px-4 sm:mx-0 sm:px-1 md:mt-12"
+      />
+      <GalleryGrid filter={filter} items={items} categoryById={categoryById} onOpen={setOpenId} actionsFor={actionsFor} />
+      <GalleryMore
+        filter={filter}
+        empty={items.length === 0}
+        remaining={pool.length - items.length}
+        onShowMore={() => setPages((count) => count + 1)}
+        onJump={jumpTo}
+      />
+    </>
+  )
 
   return (
     <section id="gallery" className="scroll-mt-24 bg-cream py-20 md:py-28">
@@ -43,34 +75,15 @@ export default function Gallery({ setBookingPreset }) {
           title="A taste of our work"
           subtitle="Browse recent cakes, treats and events. Tap any piece for details and to order something similar."
         />
-
-        <Tabs
-          tabs={tabs}
-          value={filter}
-          onChange={setFilter}
-          idPrefix="gallery"
-          label="Filter gallery by category"
-          className="-mx-4 mt-10 px-4 sm:mx-0 sm:px-1 md:mt-12"
-        />
-
-        <div
-          key={filter}
-          id="gallery-panel"
-          role="tabpanel"
-          aria-labelledby={`gallery-tab-${filter}`}
-          className="mt-8 columns-2 gap-6 md:mt-10 md:columns-3 md:gap-8 lg:columns-4"
-        >
-          {items.map((item, index) => (
-            <GalleryCard
-              key={item.id}
-              item={item}
-              categoryLabel={categoryById[item.category].label}
-              aspect={aspects[index % aspects.length]}
-              onOpen={() => setOpenId(item.id)}
-            />
-          ))}
-        </div>
-        {items.length === 0 && <p className="mt-8 text-center text-base text-espresso/75">New photos are coming soon.</p>}
+        {isOwner ? (
+          <Suspense fallback={renderPhotos(null)}>
+            <OwnerGalleryTools onChanged={reload} onSignedOut={onOwnerSignedOut}>
+              {renderPhotos}
+            </OwnerGalleryTools>
+          </Suspense>
+        ) : (
+          renderPhotos(null)
+        )}
       </Container>
 
       {openItem && (

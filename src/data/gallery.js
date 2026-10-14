@@ -6,7 +6,9 @@ export const galleryCategories = [
   { id: 'planning', label: 'Event Planning', service: 'event-management' },
 ]
 
-// Photos the owner uploads at /admin always show first. Set this to false to hide the stock photos below.
+// Photos the owner uploads at /admin always show first. The stock photos below fill the gallery only
+// until she has 10 photos of her own (OWN_PHOTOS_TARGET in utils/gallery.js). Set this to false to hide
+// the stock photos now, however many she has.
 export const showStockPhotos = true
 
 // Images are Pixabay stock placeholders (see IMAGE-CREDITS.md).

@@ -64,6 +64,13 @@ Until these are set, the public site still works and shows the stock photos.
 
 Errors come back as JSON: `{ "error": "message" }`.
 
-## Stock photos
+## Gallery rules
 
-Photos uploaded at `/admin` always show first in the gallery. To hide the stock photos once there are enough real ones, set `showStockPhotos` to `false` in `src/data/gallery.js`.
+- **All tab:** at most 10 photos. The owner's starred ("Feature on All") photos come first in her order, then her newest photos.
+- **Category tabs:** 12 photos at first, then 12 more per "Show more". Each tab shows its real photo count.
+- **Stock photos:** they fill the gallery until the owner has 10 published photos of her own, then stop showing. To hide them sooner, set `showStockPhotos` to `false` in `src/data/gallery.js`.
+- The numbers live in `src/utils/gallery.js`.
+
+## Owner mode
+
+When the owner is logged in, the public site shows her a small "Owner mode" bar and, in the gallery, an "Add photo" button plus star, hide, edit and delete buttons under her own photos. Visitors never see or download any of this: the code loads only after `/api/auth/me` confirms the session.

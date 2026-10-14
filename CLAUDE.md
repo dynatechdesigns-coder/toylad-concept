@@ -16,8 +16,8 @@ src/
   components/ui/        Container, Button, SectionHeading, SmartImage
   data/                 site.js (contact, WhatsApp, locations, hours, socials, academy), services.js,
                         gallery.js, packages.js, testimonials.js, stats.js
-  admin/                lazy-loaded /admin area: AdminApp (dashboard sections), login, photo screens, api.js
-  hooks/  utils/        useUploadedPhotos (gallery fetch), cloudinary.js (image URLs), booking.js, format.js
+  admin/                lazy-loaded: /admin (AdminApp sections, login, photo screens, api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
+  hooks/  utils/        useUploadedPhotos, useOwnerSession, gallery.js (All/category rules), cloudinary.js, booking.js, format.js
   App.jsx  Root.jsx (picks site or admin)  main.jsx  index.css
 api/
   _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, photos.js
