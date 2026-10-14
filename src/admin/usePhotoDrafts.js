@@ -5,7 +5,7 @@ const successMessage = (count) =>
   count === 1 ? 'Your photo is now on the website.' : `Your ${count} photos are now on the website.`
 
 // Photos the owner has picked but not yet published. Each draft has its own title and category.
-export default function usePhotoDrafts({ onUploaded, onSessionExpired }) {
+export default function usePhotoDrafts({ onUploaded, onSessionExpired, onProblem }) {
   const [drafts, setDrafts] = useState([])
   const [publishing, setPublishing] = useState(false)
   const [message, setMessage] = useState('')
@@ -77,6 +77,7 @@ export default function usePhotoDrafts({ onUploaded, onSessionExpired }) {
           break
         }
         patch(draft.id, { progress: null, failure: problem.message })
+        onProblem()
       }
     }
     setPublishing(false)

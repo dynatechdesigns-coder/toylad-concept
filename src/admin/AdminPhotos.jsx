@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { galleryCategories } from '../data/gallery'
 import ConfirmDeleteDialog from './ConfirmDeleteDialog'
+import HealthPanel from './HealthPanel'
 import PhotoCard from './PhotoCard'
 import PhotoEditDialog from './PhotoEditDialog'
 import PhotoUploader from './PhotoUploader'
@@ -9,7 +10,10 @@ import usePhotos from './usePhotos'
 const categoryLabels = Object.fromEntries(galleryCategories.map((category) => [category.id, category.label]))
 
 export default function AdminPhotos({ onSessionExpired }) {
-  const { photos, error, busy, add, update, remove, move } = usePhotos(onSessionExpired)
+  // Counts errors: each one shows the connection check again with fresh results.
+  const [problems, setProblems] = useState(0)
+  const onProblem = () => setProblems((count) => count + 1)
+  const { photos, error, busy, add, update, remove, move } = usePhotos({ onSessionExpired, onProblem })
   // { type: 'edit' | 'delete', photo } while a dialog is open.
   const [dialog, setDialog] = useState(null)
 
@@ -19,7 +23,8 @@ export default function AdminPhotos({ onSessionExpired }) {
 
   return (
     <>
-      <PhotoUploader onUploaded={add} onSessionExpired={onSessionExpired} />
+      <PhotoUploader onUploaded={add} onSessionExpired={onSessionExpired} onProblem={onProblem} />
+      {problems > 0 && <HealthPanel key={problems} />}
 
       <section aria-labelledby="your-photos-title" className="mt-12">
         <h2 id="your-photos-title" className="text-3xl font-semibold">

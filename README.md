@@ -6,8 +6,8 @@ Showcase, menu and booking site for Toylad Concept (custom cakes, pastries, even
 
 | Command | What it does |
 |---|---|
-| `npm run dev` | Runs the public site only. The `/api` routes are not available, so the gallery shows stock photos and `/admin` cannot log in. |
-| `npx vercel dev` | Runs the site and the `/api` routes together. Use this to test the admin area. |
+| `npm run dev` | Runs the site and the `/api` routes at http://localhost:3000. The admin area is at http://localhost:3000/admin. |
+| `npx vercel dev` | Optional: runs the same thing through the Vercel CLI (needs `npx vercel login`). |
 | `npm run build` | Builds the site into `dist/`. |
 | `npm run lint` | Checks the code with Oxlint. |
 | `npm run hash-password` | Asks for the admin password and prints its bcrypt hash. |
@@ -60,6 +60,7 @@ Until these are set, the public site still works and shows the stock photos.
 | `POST /api/admin/photos` | owner | Save a photo after it has uploaded. |
 | `PATCH /api/admin/photos/:id` | owner | Change title, category, visibility or order. |
 | `DELETE /api/admin/photos/:id` | owner | Delete from Cloudinary and MongoDB. |
+| `GET /api/admin/health` | owner | Check the settings, the database and photo storage. Never returns secret values. |
 
 Errors come back as JSON: `{ "error": "message" }`.
 

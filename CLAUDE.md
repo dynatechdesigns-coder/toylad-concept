@@ -6,7 +6,7 @@ Luxury showcase, menu and booking site for Toylad Concept: custom cakes, artisan
 - React + Vite (JavaScript/JSX), Tailwind CSS v4 via `@tailwindcss/vite`, Lucide React icons
 - Booking forms compose a pre-filled WhatsApp message (`https://wa.me/<number>?text=`)
 - Admin photo uploads: Vercel serverless functions in `/api` (Node runtime), MongoDB Atlas, Cloudinary
-- Commands: `npm run dev` · `npm run build` · `npm run lint` · `npm run hash-password` · `npx vercel dev` (site + API)
+- Commands: `npm run dev` · `npm run build` · `npm run lint` · `npm run hash-password`. `npm run dev` serves the site and `/api` on port 3000 (`scripts/dev-api.js`)
 
 ## Structure
 ```text
@@ -23,7 +23,7 @@ api/
   _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, photos.js
   auth/                 login, logout, me
   photos.js             public list of published photos
-  admin/                upload-signature, photos/index (list, create), photos/[id] (edit, delete)
+  admin/                upload-signature, health (connection check), photos/index (list, create), photos/[id] (edit, delete)
 public/images/          local stock images    scripts/hash-password.js    vercel.json (/admin rewrite, noindex)
 ```
 

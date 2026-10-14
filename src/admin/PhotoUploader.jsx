@@ -14,10 +14,11 @@ function onPick(addFiles) {
   }
 }
 
-export default function PhotoUploader({ onUploaded, onSessionExpired }) {
+export default function PhotoUploader({ onUploaded, onSessionExpired, onProblem }) {
   const { drafts, publishing, message, addFiles, remove, change, publish } = usePhotoDrafts({
     onUploaded,
     onSessionExpired,
+    onProblem,
   })
   const count = drafts.length
   const idle = publishing ? 'pointer-events-none opacity-50' : ''

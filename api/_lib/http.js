@@ -39,7 +39,11 @@ export function route(handlers, { auth = false } = {}) {
         return
       }
       console.error(error)
-      res.status(500).json({ error: 'Something went wrong. Please try again.' })
+      const database = String(error?.name).startsWith('Mongo') || String(error?.message).startsWith('Database connection')
+      const message = database
+        ?'The photo database did not answer. Please try again.'
+        : 'Something went wrong on the website. Please try again.'
+      res.status(500).json({ error: message })
     }
   }
 }

@@ -3,6 +3,13 @@ import resizeImage from './resizeImage'
 const offline = 'Could not connect. Check your internet and try again.'
 const uploadFailed = 'Upload failed. Check your internet and try again.'
 
+// The three steps of publishing a photo, used to say which one failed.
+const steps = {
+  signature: 'Step 1 of 3 failed: getting permission to upload.',
+  upload: 'Step 2 of 3 failed: sending the photo to photo storage.',
+  save: 'Step 3 of 3 failed: saving the photo to the database.',
+}
+
 // `status` is the HTTP status (0 = no connection). 401 means the session has ended.
 export class ApiError extends Error {
   constructor(message, status) {
@@ -25,7 +32,7 @@ async function request(path, { method = 'GET', body } = {}) {
   }
   const data = await response.json().catch(() => null)
   if (!response.ok || !data) {
-    throw new ApiError(data?.error ?? 'Something went wrong. Please try again.', response.status)
+    throw new ApiError(data?.error ?? `The website did not answer properly (error ${response.status}).`, response.status)
   }
   return data
 }
@@ -36,6 +43,17 @@ export const logout = () => request('/api/auth/logout', { method: 'POST' })
 export const listPhotos = () => request('/api/admin/photos')
 export const updatePhoto = (id, changes) => request(`/api/admin/photos/${id}`, { method: 'PATCH', body: changes })
 export const deletePhoto = (id) => request(`/api/admin/photos/${id}`, { method: 'DELETE' })
+export const getHealth = () => request('/api/admin/health')
+
+// Runs one upload step; on failure the message says which step it was. 401 passes through untouched.
+async function inStep(step, action) {
+  try {
+    return await action()
+  } catch (problem) {
+    if (problem.status === 401) throw problem
+    throw new ApiError(`${steps[step]} ${problem.message}`, problem.status)
+  }
+}
 
 // XMLHttpRequest rather than fetch, because fetch cannot report upload progress.
 function sendToCloudinary(file, signed, onProgress) {
@@ -60,7 +78,8 @@ function sendToCloudinary(file, signed, onProgress) {
         // Handled below as a failed upload.
       }
       if (xhr.status === 200 && data?.public_id) resolve(data)
-      else reject(new ApiError(uploadFailed, xhr.status))
+      else if (data?.error?.message) reject(new ApiError(`Photo storage said: “${data.error.message}”`, 502))
+      else reject(new ApiError(uploadFailed, 502))
     }
     xhr.onerror = () => reject(new ApiError(uploadFailed, 0))
     xhr.send(form)
@@ -69,11 +88,10 @@ function sendToCloudinary(file, signed, onProgress) {
 
 // Uploads straight to Cloudinary with a signature from our API, then saves the photo record.
 export async function uploadPhoto({ file, title, category }, onProgress) {
-  const signed = await request('/api/admin/upload-signature', { method: 'POST' })
-  const upload = await sendToCloudinary(await resizeImage(file), signed, onProgress)
-  const { photo } = await request('/api/admin/photos', {
-    method: 'POST',
-    body: { title, category, publicId: upload.public_id },
-  })
+  const signed = await inStep('signature', () => request('/api/admin/upload-signature', { method: 'POST' }))
+  const upload = await inStep('upload', async () => sendToCloudinary(await resizeImage(file), signed, onProgress))
+  const { photo } = await inStep('save', () =>
+    request('/api/admin/photos', { method: 'POST', body: { title, category, publicId: upload.public_id } }),
+  )
   return photo
 }

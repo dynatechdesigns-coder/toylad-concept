@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react'
 import { deletePhoto, listPhotos, updatePhoto } from './api'
 
 // The owner's photos in website order, plus the actions the Photos screen needs.
-export default function usePhotos(onSessionExpired) {
+export default function usePhotos({ onSessionExpired, onProblem }) {
   const [photos, setPhotos] = useState(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   const fail = (problem) => {
-    if (problem.status === 401) onSessionExpired()
-    else setError(problem.message)
+    if (problem.status === 401) return onSessionExpired()
+    setError(problem.message)
+    onProblem()
   }
 
   const load = () =>
