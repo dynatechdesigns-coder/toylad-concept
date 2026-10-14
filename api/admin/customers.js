@@ -1,5 +1,6 @@
 import { sentCollection } from '../_lib/celebrations.js'
 import { customerValidators, customersCollection, toCustomer } from '../_lib/customers.js'
+import { feedbackCollection } from '../_lib/feedback.js'
 import { HttpError, readJson, route } from '../_lib/http.js'
 import { leadsCollection, toLead } from '../_lib/leads.js'
 import { ordersCollection, toOrder } from '../_lib/orders.js'
@@ -65,7 +66,7 @@ export default route(
       }
     },
 
-    // Removes the customer and every enquiry of theirs, to honour a deletion request. Their orders stay
+    // Removes the customer with every enquiry and review of theirs, to honour a deletion request. Their orders stay
     // for the sales records, but with nothing that identifies them: no customer link and no notes.
     async DELETE(req) {
       const _id = objectId(req.query.id)
@@ -74,6 +75,7 @@ export default route(
       const { deletedCount } = await (await leadsCollection()).deleteMany({ customerId: _id })
       const kept = await (await ordersCollection()).updateMany({ customerId: _id }, { $set: { notes: '', updatedAt: new Date() }, $unset: { customerId: '', leadId: '' } })
       await (await sentCollection()).deleteMany({ customerId: _id })
+      await (await feedbackCollection()).deleteMany({ customerId: _id })
       await customers.deleteOne({ _id })
       return { deleted: true, enquiriesDeleted: deletedCount, ordersKept: kept.modifiedCount }
     },

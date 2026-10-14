@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { LayoutDashboard, Menu, X } from 'lucide-react'
-import { navCta, navLinks, ownerLinks } from '../../data/navigation'
+import { navCta, ownerLinks } from '../../data/navigation'
 import useScrollSpy from '../../hooks/useScrollSpy'
 import useScrolled from '../../hooks/useScrolled'
 import Button from '../ui/Button'
@@ -8,13 +8,13 @@ import Container from '../ui/Container'
 import Logo from './Logo'
 import MobileMenu from './MobileMenu'
 
-const sectionIds = navLinks.map((link) => link.id)
 const menuId = 'mobile-menu'
 
-// `isOwner` adds a Dashboard button for the logged-in owner. Visitors never see it.
-export default function Navbar({ isOwner = false }) {
+// `links` are the menu links to show. `isOwner` adds a Dashboard button for the logged-in owner; visitors never see it.
+export default function Navbar({ links, isOwner = false }) {
   const [open, setOpen] = useState(false)
   const scrolled = useScrolled(20)
+  const sectionIds = useMemo(() => links.map((link) => link.id), [links])
   const activeId = useScrollSpy(sectionIds)
   const headerRef = useRef(null)
   const toggleRef = useRef(null)
@@ -58,7 +58,7 @@ export default function Navbar({ isOwner = false }) {
 
         <nav aria-label="Main" className="hidden lg:block">
           <ul className="flex items-center gap-8">
-            {navLinks.map((link) => {
+            {links.map((link) => {
               const active = link.id === activeId
               return (
                 <li key={link.id}>
@@ -106,7 +106,7 @@ export default function Navbar({ isOwner = false }) {
       <MobileMenu
         id={menuId}
         open={open}
-        links={navLinks}
+        links={links}
         activeId={activeId}
         cta={navCta}
         ownerLink={isOwner ? ownerLinks.dashboard : null}

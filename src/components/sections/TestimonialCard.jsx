@@ -13,7 +13,7 @@ function initialsOf(name) {
 }
 
 export default function TestimonialCard({ testimonial }) {
-  const { rating, quote, name, event } = testimonial
+  const { rating, comment, name, occasion } = testimonial
 
   return (
     <figure className="flex h-full flex-col rounded-3xl border border-cream/10 bg-cream/5 p-6 md:p-8">
@@ -26,7 +26,7 @@ export default function TestimonialCard({ testimonial }) {
           />
         ))}
       </div>
-      <blockquote className="mt-5 text-base leading-relaxed text-cream/90">“{quote}”</blockquote>
+      <blockquote className="mt-5 break-words text-base leading-relaxed text-cream/90">“{comment}”</blockquote>
       <figcaption className="mt-auto flex items-center gap-3 pt-6">
         <span
           aria-hidden="true"
@@ -36,7 +36,7 @@ export default function TestimonialCard({ testimonial }) {
         </span>
         <span>
           <span className="block font-semibold text-cream">{name}</span>
-          <span className="block text-sm text-cream/75">{event}</span>
+          {occasion && <span className="block text-sm text-cream/75">{occasion}</span>}
         </span>
       </figcaption>
     </figure>

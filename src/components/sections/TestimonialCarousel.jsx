@@ -1,10 +1,10 @@
 import { useRef, useState } from 'react'
-import testimonials from '../../data/testimonials'
 import { prefersReducedMotion } from '../../utils/format'
 import TestimonialCard from './TestimonialCard'
 
 // Swipeable scroll-snap row with dots below lg; a plain 3-column grid from lg up.
-export default function TestimonialCarousel() {
+// `testimonials` are approved reviews: { id, name, rating, comment, occasion }.
+export default function TestimonialCarousel({ testimonials }) {
   const trackRef = useRef(null)
   const [current, setCurrent] = useState(0)
 
@@ -39,7 +39,7 @@ export default function TestimonialCarousel() {
         ))}
       </ul>
 
-      <div className="mt-4 flex justify-center lg:hidden">
+      <div className={`mt-4 justify-center lg:hidden ${testimonials.length > 1 ? 'flex' : 'hidden'}`}>
         {testimonials.map((testimonial, index) => (
           <button
             key={testimonial.id}

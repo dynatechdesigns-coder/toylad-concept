@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import AdminCelebrations from './AdminCelebrations'
 import AdminCustomers from './AdminCustomers'
+import AdminFeedback from './AdminFeedback'
 import AdminLayout from './AdminLayout'
 import AdminOrders from './AdminOrders'
 import AdminLogin from './AdminLogin'
@@ -11,13 +12,14 @@ import CelebrationsSummary from './CelebrationsSummary'
 import { rememberOwner } from '../utils/ownerHint'
 import { getSession, logout } from './api'
 
-// Dashboard sections, one tab each. Add feedback here later, with its own screen component.
+// Dashboard sections, one tab each.
 const sections = [
   { id: 'photos', label: 'Photos', Screen: AdminPhotos },
   { id: 'prospects', label: 'Prospects', Screen: AdminProspects },
   { id: 'orders', label: 'Orders', Screen: AdminOrders },
   { id: 'customers', label: 'Customers', Screen: AdminCustomers },
   { id: 'celebrations', label: 'Celebrations', Screen: AdminCelebrations },
+  { id: 'feedback', label: 'Feedback', Screen: AdminFeedback },
   { id: 'reports', label: 'Reports', Screen: AdminReports },
 ]
 

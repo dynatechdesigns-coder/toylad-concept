@@ -2,13 +2,14 @@ import { buildCelebrations, sentCollection } from '../../_lib/celebrations.js'
 import { GALLERY_FOLDER, getCloudinary } from '../../_lib/cloudinary.js'
 import { customersCollection } from '../../_lib/customers.js'
 import { getDb } from '../../_lib/db.js'
+import { feedbackCollection, toFeedback } from '../../_lib/feedback.js'
 import { HttpError, readJson, route } from '../../_lib/http.js'
 import { leadsCollection } from '../../_lib/leads.js'
 import { ordersCollection, todayInNigeria } from '../../_lib/orders.js'
 import { buildReports } from '../../_lib/reports.js'
 import { objectId } from '../../_lib/validate.js'
 
-// One function serves /api/admin/tools/upload-signature, /health, /reports and /celebrations, to stay within
+// One function serves /api/admin/tools/upload-signature, /health, /reports, /celebrations and /feedback, to stay within
 // Vercel's limit of 12 functions. Every action requires the owner's session.
 
 const REQUIRED = ['MONGODB_URI', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET', 'ADMIN_PASSWORD_HASH', 'SESSION_SECRET']
@@ -121,6 +122,32 @@ const actions = {
       const sent = await sentCollection()
       await sent.updateOne({ key, year }, { $set: { key, year, customerId, sentAt: new Date() } }, { upsert: true })
       return { done: true }
+    },
+  },
+
+  // Customer reviews: the list with its average (GET), show or hide one on the website (POST), delete one (DELETE ?id=…).
+  feedback: {
+    async GET() {
+      const docs = await (await feedbackCollection()).find({}).sort({ createdAt: -1 }).limit(2000).toArray()
+      const average = docs.length === 0 ? null : Math.round((docs.reduce((sum, doc) => sum + doc.rating, 0) / docs.length) * 10) / 10
+      return { feedback: docs.map(toFeedback), average, count: docs.length }
+    },
+    async POST(req) {
+      const { id, approved } = readJson(req)
+      if (typeof approved !== 'boolean') throw new HttpError(400, '"approved" must be true or false.')
+      const feedback = await feedbackCollection()
+      const current = await feedback.findOne({ _id: objectId(id) })
+      if (!current) throw new HttpError(404, 'That review no longer exists.')
+      // The customer's permission comes first: without it a review can never be shown.
+      if (approved && current.canPublish !== true) throw new HttpError(400, 'This customer did not give permission to show their review.')
+      if (approved && !current.comment) throw new HttpError(400, 'This review has no words to show, only a rating.')
+      const doc = await feedback.findOneAndUpdate({ _id: current._id }, { $set: { approved } }, { returnDocument: 'after' })
+      return { feedback: toFeedback(doc) }
+    },
+    async DELETE(req) {
+      const { deletedCount } = await (await feedbackCollection()).deleteOne({ _id: objectId(req.query.id) })
+      if (deletedCount === 0) throw new HttpError(404, 'That review no longer exists.')
+      return { deleted: true }
     },
   },
 

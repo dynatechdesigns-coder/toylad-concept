@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useMemo, useState } from 'react'
 import FloatingWhatsApp from './components/layout/FloatingWhatsApp'
 import Footer from './components/layout/Footer'
 import Navbar from './components/layout/Navbar'
@@ -9,7 +9,10 @@ import Hero from './components/sections/Hero'
 import Packages from './components/sections/Packages'
 import Services from './components/sections/Services'
 import Testimonials from './components/sections/Testimonials'
+import { navLinks } from './data/navigation'
+import { statsAreReal } from './data/stats'
 import useOwnerSession from './hooks/useOwnerSession'
+import useReviews from './hooks/useReviews'
 
 // Owner-only bar. Loaded only after the server confirms the owner is logged in.
 const OwnerBar = lazy(() => import('./admin/OwnerBar'))
@@ -19,20 +22,24 @@ export default function App() {
   const [bookingPreset, setBookingPreset] = useState({ service: null, package: null })
   const [isOwner, setIsOwner] = useOwnerSession()
   const leaveOwnerMode = () => setIsOwner(false)
+  const reviews = useReviews()
+  // The Reviews section hides itself until there is something real to show, and its menu link goes with it.
+  const showReviews = reviews.length > 0 || statsAreReal
+  const links = useMemo(() => (showReviews ? navLinks : navLinks.filter((link) => link.id !== 'testimonials')), [showReviews])
 
   return (
     <>
-      <Navbar isOwner={isOwner} />
+      <Navbar links={links} isOwner={isOwner} />
       <main>
         <Hero setBookingPreset={setBookingPreset} />
         <Services setBookingPreset={setBookingPreset} />
         <Gallery setBookingPreset={setBookingPreset} isOwner={isOwner} onOwnerSignedOut={leaveOwnerMode} />
         <Packages setBookingPreset={setBookingPreset} />
-        <Testimonials />
+        <Testimonials reviews={reviews} />
         <Booking bookingPreset={bookingPreset} />
         <Academy />
       </main>
-      <Footer />
+      <Footer links={links} />
       <FloatingWhatsApp />
       {isOwner && (
         <Suspense fallback={null}>

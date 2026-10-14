@@ -13,17 +13,17 @@ Luxury showcase, menu and booking site for Toylad Concept: custom cakes, artisan
 src/
   components/layout/    Navbar, Footer, FloatingWhatsApp
   components/sections/  Hero, Services, Gallery, Packages, Testimonials, Booking
-  components/ui/        Container, Button, SectionHeading, SmartImage
+  components/ui/        Container, Button, SectionHeading, SmartImage, Modal, StarRating    components/feedback/  the public /feedback page
   data/                 site.js (contact, WhatsApp, locations, hours, socials, academy), services.js,
-                        gallery.js, packages.js, testimonials.js, stats.js, crm.js (lead statuses), orders.js, celebrations.js (greeting templates), privacy.js
-  admin/                lazy-loaded: /admin (AdminApp sections: Photos, Prospects, Orders, Customers, Celebrations, Reports; api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
+                        gallery.js, packages.js, stats.js, crm.js (lead statuses), orders.js, celebrations.js (greeting templates), feedback.js, privacy.js
+  admin/                lazy-loaded: /admin (AdminApp sections: Photos, Prospects, Orders, Customers, Celebrations, Feedback, Reports; api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
   hooks/  utils/        useUploadedPhotos, useOwnerSession, gallery.js (All/category rules), cloudinary.js, booking.js, format.js
   App.jsx  Root.jsx (picks site or admin)  main.jsx  index.css
 api/
-  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, validate.js, photos.js, customers.js, leads.js, orders.js, reports.js, celebrations.js, digest.js
+  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, validate.js, rateLimit.js, photos.js, customers.js, leads.js, orders.js, feedback.js, reports.js, celebrations.js, digest.js
   auth/[action].js      login, logout, me in one function (Vercel Hobby allows 12 functions; there are 11, so merge rather than add files)
-  photos.js enquiries.js  public: published photos; save a booking-form enquiry (honeypot, rate limit)
-  admin/                photos/, leads/ (each index + [id]), customers.js, orders.js (one item with ?id=), tools/[action].js (upload-signature, health, reports, celebrations)
+  photos.js enquiries.js feedback.js  public: published photos; save an enquiry; leave a review and list approved ones (honeypot, rate limit)
+  admin/                photos/ (index + [id]), leads.js, customers.js, orders.js (one item with ?id=), tools/[action].js (upload-signature, health, reports, celebrations, feedback)
   cron/daily-digest.js  morning email via Vercel Cron (06:00 UTC), protected by CRON_SECRET
 public/images/          local stock images    scripts/hash-password.js    vercel.json (/admin rewrite, noindex)
 ```
@@ -57,7 +57,7 @@ public/images/          local stock images    scripts/hash-password.js    vercel
 - Focus rings: `focus-visible:ring-2 ring-teal`.
 - Stock images: local files only, from free-license sources (Unsplash, Pexels, Pixabay) with credits logged in IMAGE-CREDITS.md; never hotlink or use Google Images/Pinterest. Max 1600px wide, under ~300KB.
 - Image loading: `loading="lazy"` except the hero; fixed aspect ratios to prevent layout shift.
-- Testimonials use initials avatars, never stock photos of faces.
+- Testimonials are approved customer reviews from the database (customer's permission AND owner's approval), shown with initials avatars and a shortened name. Never invent reviews.
 - Keep components under ~150 lines; split if larger. No new dependencies without asking.
 - Placeholder contact details, prices and stats are marked `// TODO` in `src/data/`.
 

@@ -9,6 +9,9 @@ export const navLinks = [
 
 export const navCta = { label: 'Book / Order Now', href: '#booking' }
 
+// The public feedback page. Linked from the footer only.
+export const feedbackLink = { label: 'Leave a review', href: '/feedback' }
+
 // Ways into the owner's admin area. `dashboard` is only shown to the logged-in owner.
 export const ownerLinks = {
   login: { label: 'Owner login', href: '/admin' },

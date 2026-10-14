@@ -1,6 +1,8 @@
 import { CalendarClock, CircleCheck, Pencil, X } from 'lucide-react'
+import WhatsAppLink from '../components/ui/WhatsAppLink'
+import { feedbackRequestMessage } from '../data/feedback'
 import { orderStatuses } from '../data/orders'
-import { displayPhone, formatDay, formatNaira } from './crmFormat'
+import { displayPhone, formatDay, formatNaira, whatsappTo } from './crmFormat'
 import { actionButton } from './fieldStyles'
 
 const statusLabel = (id) => orderStatuses.find((status) => status.id === id)?.label ?? id
@@ -10,6 +12,8 @@ const pill = 'rounded-full px-3 py-1 text-sm font-semibold'
 // Pass only the handlers that apply: a delivered or cancelled order can only be edited.
 export default function OrderCard({ order, flag, busy, onDelivered, onCancel, onEdit }) {
   const balance = order.deposit === null ? null : order.amount - order.deposit
+  // Each delivered order has its own feedback link, which pre-fills the customer's name on the form.
+  const feedbackLink = `${window.location.origin}/feedback?o=${order.id}`
 
   return (
     <li className={`rounded-3xl bg-cream p-4 shadow-sm md:p-6 ${flag ? 'border-2 border-terracotta' : 'border border-espresso/10'}`}>
@@ -56,6 +60,12 @@ export default function OrderCard({ order, flag, busy, onDelivered, onCancel, on
         )}
       </dl>
       {order.notes && <p className="mt-3 whitespace-pre-line break-words text-base text-espresso/75">{order.notes}</p>}
+
+      {order.status === 'delivered' && order.customer && (
+        <WhatsAppLink href={whatsappTo(order.customer.phone, feedbackRequestMessage({ name: order.customer.name, link: feedbackLink }))} className="mt-4 w-full">
+          Ask for feedback
+        </WhatsAppLink>
+      )}
 
       <div className="mt-4 grid gap-2 sm:grid-cols-3">
         {onDelivered && (

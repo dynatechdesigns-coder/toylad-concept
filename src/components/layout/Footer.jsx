@@ -1,5 +1,5 @@
 import { ArrowUp, Lock } from 'lucide-react'
-import { navLinks, ownerLinks } from '../../data/navigation'
+import { feedbackLink, ownerLinks } from '../../data/navigation'
 import services from '../../data/services'
 import site from '../../data/site'
 import Container from '../ui/Container'
@@ -12,12 +12,15 @@ const link =
   'inline-flex min-h-11 items-center rounded-full text-cream/80 transition duration-300 ease-out decoration-butter underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-butter motion-reduce:transition-none'
 
 const year = new Date().getFullYear()
-const linkColumns = [
-  { title: 'Quick Links', links: navLinks.map(({ id, label }) => ({ key: id, label, href: `#${id}` })) },
-  { title: 'Services', links: services.map(({ id, title }) => ({ key: id, label: title, href: '#services' })) },
-]
+const serviceLinks = services.map(({ id, title }) => ({ key: id, label: title, href: '#services' }))
 
-export default function Footer() {
+// `links` are the same menu links the navbar shows.
+export default function Footer({ links }) {
+  const linkColumns = [
+    { title: 'Quick Links', links: [...links.map(({ id, label }) => ({ key: id, label, href: `#${id}` })), { key: 'feedback', ...feedbackLink }] },
+    { title: 'Services', links: serviceLinks },
+  ]
+
   return (
     <footer id="contact" className="scroll-mt-24 bg-navy text-cream">
       <Container className="grid gap-10 py-16 sm:grid-cols-2 md:py-20 lg:grid-cols-[1.5fr_1fr_1.2fr_1.5fr_1.3fr] lg:gap-8">

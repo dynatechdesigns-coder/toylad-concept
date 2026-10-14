@@ -16,7 +16,7 @@ Showcase, menu and booking site for Toylad Concept (custom cakes, pastries, even
 
 - **Site:** React + Vite + Tailwind CSS. Booking forms open WhatsApp with a pre-filled message.
 - **API:** Vercel serverless functions in `/api` (Node runtime).
-- **Database:** MongoDB Atlas, database `toylad`, collections `photos`, `customers`, `leads` (enquiries), `orders` and `celebrationsSent`.
+- **Database:** MongoDB Atlas, database `toylad`, collections `photos`, `customers`, `leads` (enquiries), `orders`, `feedback` and `celebrationsSent`.
 - **Images:** Cloudinary, folder `toylad/gallery`. The browser uploads straight to Cloudinary using a signature from the API, so large phone photos never pass through Vercel.
 - **Login:** one owner password. A correct password sets a signed, httpOnly session cookie that lasts 7 days.
 
@@ -79,9 +79,14 @@ Vercel Cron (`crons` in `vercel.json`) calls `/api/cron/daily-digest` once a day
 | `POST /api/admin/orders` | owner | New order for an existing (`customerId`) or new (`newCustomer`) customer; `leadId` confirms that enquiry. |
 | `PATCH /api/admin/orders?id=…` | owner | Edit an order or change its status (confirmed, delivered, cancelled). |
 | `POST /api/enquiries` | public | Save a copy of a booking-form enquiry: creates or updates the customer by phone and adds a lead. |
+| `GET /api/feedback` | public | Approved reviews for the Testimonials section (newest first, up to 6). With `?o=<orderId>`: the name to pre-fill. |
+| `POST /api/feedback` | public | Leave a review. |
+| `GET /api/admin/tools/feedback` | owner | All reviews with the average rating. |
+| `POST /api/admin/tools/feedback` | owner | Show or hide a review on the website (`{ id, approved }`). |
+| `DELETE /api/admin/tools/feedback?id=…` | owner | Delete a review. |
 | `GET /api/admin/leads` | owner | Open enquiries, newest first (`?scope=all` for every enquiry). |
 | `POST /api/admin/leads` | owner | Record an enquiry that came by WhatsApp, phone or walk-in. |
-| `PATCH /api/admin/leads/:id` | owner | Change status (a reason is required for "lost") or the follow-up date. |
+| `PATCH /api/admin/leads?id=…` | owner | Change status (a reason is required for "lost") or the follow-up date. |
 | `GET /api/admin/customers` | owner | All customers, most recently in touch first. |
 | `GET /api/admin/customers?id=…` | owner | One customer with all their enquiries and orders. |
 | `PATCH /api/admin/customers?id=…` | owner | Edit details, consent or notes; `addNote` adds a dated note. |
@@ -110,7 +115,15 @@ Errors come back as JSON: `{ "error": "message" }`.
 - **Loyal customers** have 3 or more orders. **Quiet customers** ordered before but not in the last 6 months; the "We miss you" button only appears for customers who agreed to offers.
 - **Export to Excel** on the Reports tab saves customers or orders as a `.csv` file.
 - **Deleting a customer** keeps their orders in the sales figures, but removes the link to them and the order notes.
-- **Vercel function limit:** the Hobby plan allows 12 serverless functions and this project uses 11. Related routes share one file (`api/auth/[action].js`, `api/admin/tools/[action].js`, `api/admin/orders.js`, `api/admin/customers.js`).
+- **Vercel function limit:** the Hobby plan allows 12 serverless functions and this project uses 11. Related routes share one file (`api/auth/[action].js`, `api/admin/tools/[action].js`, `api/admin/orders.js`, `api/admin/customers.js`, `api/admin/leads.js`).
+
+## Feedback and testimonials
+
+- **Feedback page:** `/feedback`, linked in the footer. A personal link, `/feedback?o=<orderId>`, pre-fills the customer's name and ties the review to that order; "Ask for feedback" on a delivered order sends it by WhatsApp.
+- **Two locks before a review is public:** the customer must tick "You may show my review on your website", and the owner must switch on "Show on website" in the Feedback tab. A rating with no comment is never shown.
+- **On the website:** up to 6 approved reviews, newest first, with the name shortened to first name and last initial (e.g. "Kemi A."). No phone number is ever sent to the browser.
+- **No reviews yet:** the Reviews section and its menu link are hidden. The stats row is hidden too until `statsAreReal` is set to `true` in `src/data/stats.js`.
+- **Deleting:** a review can be deleted in the Feedback tab; deleting a customer deletes their linked reviews.
 
 ## Celebrations
 
