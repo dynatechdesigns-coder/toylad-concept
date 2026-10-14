@@ -1,7 +1,9 @@
+import { LayoutDashboard } from 'lucide-react'
 import Button from '../ui/Button'
 import Container from '../ui/Container'
 
-export default function MobileMenu({ id, open, links, activeId, cta, onNavigate }) {
+// `ownerLink` is set only for the logged-in owner.
+export default function MobileMenu({ id, open, links, activeId, cta, ownerLink, onNavigate }) {
   const state = open ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-4 opacity-0'
 
   return (
@@ -32,6 +34,11 @@ export default function MobileMenu({ id, open, links, activeId, cta, onNavigate 
         <Button href={cta.href} size="lg" onClick={onNavigate} className="mt-6 w-full">
           {cta.label}
         </Button>
+        {ownerLink && (
+          <Button href={ownerLink.href} variant="outline" size="lg" icon={LayoutDashboard} className="mt-3 w-full">
+            {ownerLink.label}
+          </Button>
+        )}
       </Container>
     </div>
   )

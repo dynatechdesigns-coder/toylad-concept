@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { LogIn } from 'lucide-react'
+import { ArrowLeft, LogIn } from 'lucide-react'
 import Logo from '../components/layout/Logo'
 import Button from '../components/ui/Button'
 import AdminField from './AdminField'
@@ -32,12 +32,12 @@ export default function AdminLogin({ onSuccess }) {
     <main className="flex min-h-dvh items-center justify-center bg-cream px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-espresso/10 bg-butter-soft p-6 shadow-sm md:p-10">
         <div className="flex justify-center">
-          <Logo />
+          <Logo href="/" />
         </div>
         <p className="mt-8 text-center text-sm font-semibold uppercase tracking-widest text-navy">Owner area</p>
         <h1 className="mt-3 text-center text-3xl font-semibold md:text-4xl">Welcome back</h1>
         <p className="mt-3 text-center text-base leading-relaxed text-espresso/75 md:text-lg">
-          Enter your password to manage your photos.
+          Enter your password to open your dashboard.
         </p>
 
         <form onSubmit={onSubmit} noValidate className="mt-8">
@@ -59,6 +59,16 @@ export default function AdminLogin({ onSuccess }) {
             {busy ? 'Logging in…' : 'Log in'}
           </Button>
         </form>
+
+        <p className="mt-6 text-center">
+          <a
+            href="/"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full text-base font-semibold text-navy underline underline-offset-4 hover:text-espresso focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          >
+            <ArrowLeft className="size-5" aria-hidden="true" />
+            Back to website
+          </a>
+        </p>
       </div>
     </main>
   )

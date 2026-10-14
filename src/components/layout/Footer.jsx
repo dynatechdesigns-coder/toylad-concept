@@ -1,5 +1,5 @@
-import { ArrowUp } from 'lucide-react'
-import { navLinks } from '../../data/navigation'
+import { ArrowUp, Lock } from 'lucide-react'
+import { navLinks, ownerLinks } from '../../data/navigation'
 import services from '../../data/services'
 import site from '../../data/site'
 import Container from '../ui/Container'
@@ -63,9 +63,15 @@ export default function Footer() {
       <div className="border-t border-cream/10">
         {/* Extra bottom padding keeps the floating WhatsApp button off these controls. */}
         <Container className="flex flex-col items-center justify-between gap-4 pb-24 pt-6 text-sm text-cream/70 sm:flex-row 2xl:pb-6">
-          <p className="text-center sm:text-left">
-            © {year} {site.name}. All rights reserved.
-          </p>
+          <div className="flex flex-col items-center gap-x-4 sm:flex-row">
+            <p className="text-center sm:text-left">
+              © {year} {site.name}. All rights reserved.
+            </p>
+            <a href={ownerLinks.login.href} className={`${link} gap-1.5 text-xs text-cream/60`}>
+              <Lock className="size-3.5" aria-hidden="true" />
+              {ownerLinks.login.label}
+            </a>
+          </div>
           <button
             type="button"
             onClick={() => window.scrollTo({ top: 0 })}

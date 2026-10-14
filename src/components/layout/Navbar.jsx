@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Menu, X } from 'lucide-react'
-import { navCta, navLinks } from '../../data/navigation'
+import { LayoutDashboard, Menu, X } from 'lucide-react'
+import { navCta, navLinks, ownerLinks } from '../../data/navigation'
 import useScrollSpy from '../../hooks/useScrollSpy'
 import useScrolled from '../../hooks/useScrolled'
 import Button from '../ui/Button'
@@ -11,7 +11,8 @@ import MobileMenu from './MobileMenu'
 const sectionIds = navLinks.map((link) => link.id)
 const menuId = 'mobile-menu'
 
-export default function Navbar() {
+// `isOwner` adds a Dashboard button for the logged-in owner. Visitors never see it.
+export default function Navbar({ isOwner = false }) {
   const [open, setOpen] = useState(false)
   const scrolled = useScrolled(20)
   const activeId = useScrollSpy(sectionIds)
@@ -76,9 +77,18 @@ export default function Navbar() {
           </ul>
         </nav>
 
-        <Button href={navCta.href} size="sm" className="hidden min-h-11 lg:inline-flex">
-          {navCta.label}
-        </Button>
+        <div className="flex items-center gap-3">
+          {isOwner && (
+            <div className="hidden lg:block">
+              <Button href={ownerLinks.dashboard.href} variant="outline" size="sm" icon={LayoutDashboard} className="min-h-11">
+                {ownerLinks.dashboard.label}
+              </Button>
+            </div>
+          )}
+          <Button href={navCta.href} size="sm" className="hidden min-h-11 lg:inline-flex">
+            {navCta.label}
+          </Button>
+        </div>
 
         <button
           ref={toggleRef}
@@ -99,6 +109,7 @@ export default function Navbar() {
         links={navLinks}
         activeId={activeId}
         cta={navCta}
+        ownerLink={isOwner ? ownerLinks.dashboard : null}
         onNavigate={() => setOpen(false)}
       />
     </header>

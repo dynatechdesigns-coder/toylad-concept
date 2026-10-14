@@ -4,13 +4,13 @@ import site from '../../data/site'
 
 const [firstWord, ...otherWords] = site.name.split(' ')
 
-// `tone="dark"` is for navy backgrounds (footer).
-export default function Logo({ tone = 'light', className = '' }) {
+// `tone="dark"` is for navy backgrounds (footer). `href` is where the logo leads (the admin passes "/").
+export default function Logo({ tone = 'light', href = '#top', className = '' }) {
   const dark = tone === 'dark'
 
   return (
     <a
-      href="#top"
+      href={href}
       aria-label={`${site.name} home`}
       className={`inline-flex min-h-11 items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 ${dark ? 'focus-visible:ring-butter' : 'focus-visible:ring-teal'} ${className}`}
     >

@@ -1,4 +1,4 @@
-import { ExternalLink, LogOut } from 'lucide-react'
+import { ArrowLeft, LogOut } from 'lucide-react'
 import Logo from '../components/layout/Logo'
 import Container from '../components/ui/Container'
 import site from '../data/site'
@@ -13,11 +13,11 @@ export default function AdminLayout({ sections, sectionId, onSectionChange, onLo
     <div className="min-h-dvh bg-cream">
       <header className="sticky top-0 z-40 bg-cream/90 shadow-sm backdrop-blur">
         <Container className="flex min-h-16 flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2 lg:min-h-20">
-          <Logo />
+          <Logo href="/" />
           <div className="flex gap-2">
             <a href="/" className={actionButton}>
-              <ExternalLink className="size-5" aria-hidden="true" />
-              View website
+              <ArrowLeft className="size-5" aria-hidden="true" />
+              Back to website
             </a>
             <button type="button" onClick={onLogout} className={actionButton}>
               <LogOut className="size-5" aria-hidden="true" />

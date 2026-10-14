@@ -22,7 +22,7 @@ export default function App() {
 
   return (
     <>
-      <Navbar />
+      <Navbar isOwner={isOwner} />
       <main>
         <Hero setBookingPreset={setBookingPreset} />
         <Services setBookingPreset={setBookingPreset} />
