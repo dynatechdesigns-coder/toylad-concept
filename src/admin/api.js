@@ -43,7 +43,7 @@ export const logout = () => request('/api/auth/logout', { method: 'POST' })
 export const listPhotos = () => request('/api/admin/photos')
 export const updatePhoto = (id, changes) => request(`/api/admin/photos/${id}`, { method: 'PATCH', body: changes })
 export const deletePhoto = (id) => request(`/api/admin/photos/${id}`, { method: 'DELETE' })
-export const getHealth = () => request('/api/admin/health')
+export const getHealth = () => request('/api/admin/tools/health')
 
 export const listLeads = () => request('/api/admin/leads')
 export const createLead = (enquiry) => request('/api/admin/leads', { method: 'POST', body: enquiry })
@@ -52,6 +52,10 @@ export const listCustomers = () => request('/api/admin/customers')
 export const getCustomer = (id) => request(`/api/admin/customers/${id}`)
 export const updateCustomer = (id, changes) => request(`/api/admin/customers/${id}`, { method: 'PATCH', body: changes })
 export const deleteCustomer = (id) => request(`/api/admin/customers/${id}`, { method: 'DELETE' })
+export const listOrders = () => request('/api/admin/orders')
+export const createOrder = (order) => request('/api/admin/orders', { method: 'POST', body: order })
+export const updateOrder = (id, changes) => request(`/api/admin/orders?id=${id}`, { method: 'PATCH', body: changes })
+export const getReports = () => request('/api/admin/tools/reports')
 
 // Runs one upload step; on failure the message says which step it was. 401 passes through untouched.
 async function inStep(step, action) {
@@ -96,7 +100,7 @@ function sendToCloudinary(file, signed, onProgress) {
 
 // Uploads straight to Cloudinary with a signature from our API, then saves the photo record.
 export async function uploadPhoto({ file, title, category }, onProgress) {
-  const signed = await inStep('signature', () => request('/api/admin/upload-signature', { method: 'POST' }))
+  const signed = await inStep('signature', () => request('/api/admin/tools/upload-signature', { method: 'POST' }))
   const upload = await inStep('upload', async () => sendToCloudinary(await resizeImage(file), signed, onProgress))
   const { photo } = await inStep('save', () =>
     request('/api/admin/photos', { method: 'POST', body: { title, category, publicId: upload.public_id } }),

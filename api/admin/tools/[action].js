@@ -1,15 +1,15 @@
-import { getCloudinary } from '../_lib/cloudinary.js'
-import { getDb } from '../_lib/db.js'
-import { route } from '../_lib/http.js'
+import { GALLERY_FOLDER, getCloudinary } from '../../_lib/cloudinary.js'
+import { customersCollection } from '../../_lib/customers.js'
+import { getDb } from '../../_lib/db.js'
+import { route } from '../../_lib/http.js'
+import { leadsCollection } from '../../_lib/leads.js'
+import { ordersCollection } from '../../_lib/orders.js'
+import { buildReports } from '../../_lib/reports.js'
 
-const REQUIRED = [
-  'MONGODB_URI',
-  'CLOUDINARY_CLOUD_NAME',
-  'CLOUDINARY_API_KEY',
-  'CLOUDINARY_API_SECRET',
-  'ADMIN_PASSWORD_HASH',
-  'SESSION_SECRET',
-]
+// One function serves /api/admin/tools/upload-signature, /health and /reports, to stay within
+// Vercel's limit of 12 functions. Every action requires the owner's session.
+
+const REQUIRED = ['MONGODB_URI', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET', 'ADMIN_PASSWORD_HASH', 'SESSION_SECRET']
 
 // Reports only whether each value is set and well-formed. Values are never returned.
 function settingsCheck() {
@@ -77,13 +77,40 @@ async function storageCheck() {
   }
 }
 
-// Owner only: checks settings, database and photo storage, with a plain-English hint for each failure.
-export default route(
-  {
+const actions = {
+  // Signs one direct browser-to-Cloudinary upload. The API secret never leaves the server.
+  'upload-signature': {
+    POST() {
+      const cloudinary = getCloudinary()
+      const timestamp = Math.round(Date.now() / 1000)
+      const signature = cloudinary.utils.api_sign_request({ folder: GALLERY_FOLDER, timestamp }, process.env.CLOUDINARY_API_SECRET)
+      return { cloudName: process.env.CLOUDINARY_CLOUD_NAME, apiKey: process.env.CLOUDINARY_API_KEY, folder: GALLERY_FOLDER, timestamp, signature }
+    },
+  },
+
+  // Checks settings, database and photo storage, with a plain-English hint for each failure.
+  health: {
     async GET() {
       const checks = [settingsCheck(), ...(await Promise.all([databaseCheck(), storageCheck()]))]
       return { ok: checks.every((check) => check.ok), checks }
     },
   },
-  { auth: true },
-)
+
+  // The numbers behind the Reports tab.
+  reports: {
+    async GET() {
+      const [orders, customers, leads] = await Promise.all(
+        [await ordersCollection(), await customersCollection(), await leadsCollection()].map((collection) => collection.find({}).limit(10000).toArray()),
+      )
+      return buildReports({ orders, customers, leads })
+    },
+  },
+}
+
+const handlers = Object.fromEntries(Object.entries(actions).map(([name, methods]) => [name, route(methods, { auth: true })]))
+
+export default function handler(req, res) {
+  const action = handlers[req.query.action]
+  if (!action) return res.status(404).json({ error: 'Not found.' })
+  return action(req, res)
+}

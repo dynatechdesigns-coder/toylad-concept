@@ -4,6 +4,7 @@ import { formatDayMonth } from '../utils/dayMonth'
 import ConfirmDeleteDialog from './ConfirmDeleteDialog'
 import CustomerEditDialog from './CustomerEditDialog'
 import CustomerEnquiries from './CustomerEnquiries'
+import CustomerOrders from './CustomerOrders'
 import NoteDialog from './NoteDialog'
 import { deleteCustomer, getCustomer, updateCustomer } from './api'
 import { displayPhone, formatDay, whatsappTo } from './crmFormat'
@@ -55,7 +56,7 @@ export default function CustomerDetail({ id, onBack, onChanged, onDeleted, onSes
     )
   }
 
-  const { customer, leads } = data
+  const { customer, leads, orders } = data
   const facts = [
     ['Phone', displayPhone(customer.phone)],
     ['Email', customer.email || 'Not given'],
@@ -102,6 +103,9 @@ export default function CustomerDetail({ id, onBack, onChanged, onDeleted, onSes
       <h3 className="mt-10 text-xl font-semibold md:text-2xl">Notes</h3>
       <p className="mt-3 whitespace-pre-line break-words text-base md:text-lg">{customer.notes || 'No notes yet.'}</p>
 
+      <h3 className="mt-10 text-xl font-semibold md:text-2xl">Orders</h3>
+      <CustomerOrders orders={orders} />
+
       <h3 className="mt-10 text-xl font-semibold md:text-2xl">Enquiries</h3>
       <CustomerEnquiries leads={leads} />
 
@@ -116,7 +120,7 @@ export default function CustomerDetail({ id, onBack, onChanged, onDeleted, onSes
       {dialog === 'note' && <NoteDialog customerName={customer.name} busy={busy} error={error} onSave={(note) => saveChanges({ addNote: note })} onClose={close} />}
       {dialog === 'delete' && (
         <ConfirmDeleteDialog
-          message={`${customer.name}, their details, their notes and their enquiries (${leads.length}) will be deleted for good. You cannot undo this.`}
+          message={`${customer.name}, their details, their notes and their enquiries (${leads.length}) will be deleted for good. Their orders (${orders.length}) stay in your sales reports, without their name. You cannot undo this.`}
           busy={busy}
           error={error}
           onConfirm={remove}

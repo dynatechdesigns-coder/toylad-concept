@@ -37,6 +37,23 @@ export function isFollowUpDue(lead, now = Date.now()) {
   return now - new Date(lead.createdAt).getTime() >= FOLLOW_UP_DAYS * DAY
 }
 
+// 45000 -> "₦45,000"
+export function formatNaira(amount) {
+  return `₦${Number(amount).toLocaleString('en-NG', { maximumFractionDigits: 2 })}`
+}
+
+// "2026-10" -> "Oct 2026" (or "October 2026" with style "long")
+export function monthLabel(month, style = 'short') {
+  return new Date(`${month}-01T00:00`).toLocaleDateString('en-GB', { month: style, year: 'numeric' })
+}
+
+// "2026-10-14" plus 6 days -> "2026-10-20"
+export function daysFrom(day, count) {
+  const date = new Date(`${day}T12:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + count)
+  return date.toISOString().slice(0, 10)
+}
+
 export const nextFollowUp = () => new Date(Date.now() + FOLLOW_UP_DAYS * DAY).toISOString()
 
 // "+2348161556766" -> "0816 155 6766". Numbers from other countries are shown as they are.

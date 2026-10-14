@@ -8,8 +8,9 @@ import AddEnquiryDialog from './AddEnquiryDialog'
 import FollowUpDialog from './FollowUpDialog'
 import LeadStatusDialog from './LeadStatusDialog'
 import NoteDialog from './NoteDialog'
+import OrderFormDialog from './OrderFormDialog'
 import ProspectCard from './ProspectCard'
-import { createLead, listLeads, updateCustomer, updateLead } from './api'
+import { createLead, createOrder, listLeads, updateCustomer, updateLead } from './api'
 import { isFollowUpDue, nextFollowUp } from './crmFormat'
 import { controlClass } from './fieldStyles'
 import useAdminAction from './useAdminAction'
@@ -21,7 +22,7 @@ export default function AdminProspects({ onSessionExpired }) {
   const { run, busy, error, clearError } = useAdminAction(onSessionExpired)
   const [leads, setLeads] = useState(null)
   const [filters, setFilters] = useState({ status: '', service: '' })
-  // { type: 'add' } or { type: 'status' | 'whatsapp' | 'note', lead } while a dialog is open.
+  // { type: 'add' } or { type: 'status' | 'whatsapp' | 'note' | 'order', lead } while a dialog is open.
   const [dialog, setDialog] = useState(null)
 
   useEffect(() => {
@@ -100,6 +101,7 @@ export default function AdminProspects({ onSessionExpired }) {
             onStatus={() => setDialog({ type: 'status', lead })}
             onWhatsApp={() => setDialog({ type: 'whatsapp', lead })}
             onNote={() => setDialog({ type: 'note', lead })}
+            onOrder={() => setDialog({ type: 'order', lead })}
           />
         ))}
       </ul>
@@ -121,6 +123,10 @@ export default function AdminProspects({ onSessionExpired }) {
             run(() => updateLead(id, { followUpAt: nextFollowUp() })).then((data) => data && put(data.lead))
           }}
         />
+      )}
+      {dialog?.type === 'order' && (
+        // Saving the order confirms the enquiry on the server; show that here too.
+        <OrderFormDialog lead={dialog.lead} busy={busy} error={error} onClose={close} onSave={(order) => save(() => createOrder(order), () => put({ ...dialog.lead, status: 'confirmed', followUpAt: null }))} />
       )}
       {dialog?.type === 'note' && (
         <NoteDialog customerName={dialog.lead.customer.name} busy={busy} error={error} onClose={close} onSave={(note) => save(() => updateCustomer(dialog.lead.customerId, { addNote: note }), () => {})} />

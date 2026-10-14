@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react'
 import AdminCustomers from './AdminCustomers'
 import AdminLayout from './AdminLayout'
+import AdminOrders from './AdminOrders'
 import AdminLogin from './AdminLogin'
 import AdminPhotos from './AdminPhotos'
 import AdminProspects from './AdminProspects'
+import AdminReports from './AdminReports'
 import { rememberOwner } from '../utils/ownerHint'
 import { getSession, logout } from './api'
 
-// Dashboard sections, one tab each. Add orders and feedback here later, each with its own screen component.
+// Dashboard sections, one tab each. Add feedback here later, with its own screen component.
 const sections = [
   { id: 'photos', label: 'Photos', Screen: AdminPhotos },
   { id: 'prospects', label: 'Prospects', Screen: AdminProspects },
+  { id: 'orders', label: 'Orders', Screen: AdminOrders },
   { id: 'customers', label: 'Customers', Screen: AdminCustomers },
+  { id: 'reports', label: 'Reports', Screen: AdminReports },
 ]
 
 export default function AdminApp() {

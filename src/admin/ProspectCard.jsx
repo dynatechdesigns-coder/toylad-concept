@@ -1,9 +1,9 @@
-import { BellRing, MessageCircle, NotebookPen, RefreshCw } from 'lucide-react'
+import { BellRing, MessageCircle, NotebookPen, ReceiptText, RefreshCw } from 'lucide-react'
 import { displayPhone, formatDay, isFollowUpDue, serviceLabel, sourceLabel, statusLabel, timeAgo } from './crmFormat'
 import { actionButton } from './fieldStyles'
 
-// One open enquiry: who, what, when, and the three things she can do with it.
-export default function ProspectCard({ lead, busy, onStatus, onWhatsApp, onNote }) {
+// One open enquiry: who, what, when, and what she can do with it.
+export default function ProspectCard({ lead, busy, onStatus, onWhatsApp, onNote, onOrder }) {
   const due = isFollowUpDue(lead)
   const name = lead.customer?.name ?? 'Customer removed'
 
@@ -43,7 +43,7 @@ export default function ProspectCard({ lead, busy, onStatus, onWhatsApp, onNote 
       </dl>
       {lead.details && <p className="mt-3 line-clamp-3 whitespace-pre-line break-words text-base text-espresso/75">{lead.details}</p>}
 
-      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
         <button type="button" disabled={busy} onClick={onStatus} className={actionButton}>
           <RefreshCw className="size-5 shrink-0" aria-hidden="true" />
           Change status
@@ -55,6 +55,10 @@ export default function ProspectCard({ lead, busy, onStatus, onWhatsApp, onNote 
         <button type="button" disabled={busy || !lead.customer} onClick={onNote} className={actionButton}>
           <NotebookPen className="size-5 shrink-0" aria-hidden="true" />
           Add note
+        </button>
+        <button type="button" disabled={busy || !lead.customer} onClick={onOrder} className={actionButton}>
+          <ReceiptText className="size-5 shrink-0" aria-hidden="true" />
+          Create order
         </button>
       </div>
     </li>

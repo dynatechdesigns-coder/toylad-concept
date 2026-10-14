@@ -1,6 +1,7 @@
 import { customerValidators, customersCollection, toCustomer } from '../../_lib/customers.js'
 import { HttpError, readJson, route } from '../../_lib/http.js'
 import { leadsCollection, toLead } from '../../_lib/leads.js'
+import { ordersCollection, toOrder } from '../../_lib/orders.js'
 import { objectId, pickFields, text, toUpdate } from '../../_lib/validate.js'
 
 const notFound = () => new HttpError(404, 'That customer no longer exists.')
@@ -8,13 +9,18 @@ const validators = { ...customerValidators, addNote: text('The note', { max: 100
 
 export default route(
   {
-    // One customer with all their enquiries, newest first.
+    // One customer with all their enquiries and orders, newest first.
     async GET(req) {
       const _id = objectId(req.query.id)
       const customer = await (await customersCollection()).findOne({ _id })
       if (!customer) throw notFound()
       const leads = await (await leadsCollection()).find({ customerId: _id }).sort({ createdAt: -1 }).toArray()
-      return { customer: toCustomer(customer), leads: leads.map((lead) => toLead(lead, customer)) }
+      const orders = await (await ordersCollection()).find({ customerId: _id }).sort({ orderDate: -1 }).toArray()
+      return {
+        customer: toCustomer(customer),
+        leads: leads.map((lead) => toLead(lead, customer)),
+        orders: orders.map((order) => toOrder(order, customer)),
+      }
     },
 
     async PATCH(req) {
@@ -50,14 +56,16 @@ export default route(
       }
     },
 
-    // Removes the customer and every enquiry of theirs, to honour a deletion request.
+    // Removes the customer and every enquiry of theirs, to honour a deletion request. Their orders stay
+    // for the sales records, but with nothing that identifies them: no customer link and no notes.
     async DELETE(req) {
       const _id = objectId(req.query.id)
       const customers = await customersCollection()
       if (!(await customers.findOne({ _id }))) throw notFound()
       const { deletedCount } = await (await leadsCollection()).deleteMany({ customerId: _id })
+      const kept = await (await ordersCollection()).updateMany({ customerId: _id }, { $set: { notes: '', updatedAt: new Date() }, $unset: { customerId: '', leadId: '' } })
       await customers.deleteOne({ _id })
-      return { deleted: true, enquiriesDeleted: deletedCount }
+      return { deleted: true, enquiriesDeleted: deletedCount, ordersKept: kept.modifiedCount }
     },
   },
   { auth: true },
