@@ -49,13 +49,15 @@ export const listLeads = () => request('/api/admin/leads')
 export const createLead = (enquiry) => request('/api/admin/leads', { method: 'POST', body: enquiry })
 export const updateLead = (id, changes) => request(`/api/admin/leads/${id}`, { method: 'PATCH', body: changes })
 export const listCustomers = () => request('/api/admin/customers')
-export const getCustomer = (id) => request(`/api/admin/customers/${id}`)
-export const updateCustomer = (id, changes) => request(`/api/admin/customers/${id}`, { method: 'PATCH', body: changes })
-export const deleteCustomer = (id) => request(`/api/admin/customers/${id}`, { method: 'DELETE' })
+export const getCustomer = (id) => request(`/api/admin/customers?id=${id}`)
+export const updateCustomer = (id, changes) => request(`/api/admin/customers?id=${id}`, { method: 'PATCH', body: changes })
+export const deleteCustomer = (id) => request(`/api/admin/customers?id=${id}`, { method: 'DELETE' })
 export const listOrders = () => request('/api/admin/orders')
 export const createOrder = (order) => request('/api/admin/orders', { method: 'POST', body: order })
 export const updateOrder = (id, changes) => request(`/api/admin/orders?id=${id}`, { method: 'PATCH', body: changes })
 export const getReports = () => request('/api/admin/tools/reports')
+export const getCelebrations = () => request('/api/admin/tools/celebrations')
+export const markCelebrationDone = (key, year) => request('/api/admin/tools/celebrations', { method: 'POST', body: { key, year } })
 
 // Runs one upload step; on failure the message says which step it was. 401 passes through untouched.
 async function inStep(step, action) {

@@ -81,6 +81,7 @@ export function toOrder(doc, customer) {
     orderDate: doc.orderDate,
     deliveryDate: doc.deliveryDate,
     status: doc.status,
+    deliveredAt: doc.deliveredAt ?? null,
     occasion: doc.occasion ?? null,
     notes: doc.notes ?? '',
     createdAt: doc.createdAt,

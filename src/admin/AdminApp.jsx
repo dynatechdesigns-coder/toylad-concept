@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import AdminCelebrations from './AdminCelebrations'
 import AdminCustomers from './AdminCustomers'
 import AdminLayout from './AdminLayout'
 import AdminOrders from './AdminOrders'
@@ -6,6 +7,7 @@ import AdminLogin from './AdminLogin'
 import AdminPhotos from './AdminPhotos'
 import AdminProspects from './AdminProspects'
 import AdminReports from './AdminReports'
+import CelebrationsSummary from './CelebrationsSummary'
 import { rememberOwner } from '../utils/ownerHint'
 import { getSession, logout } from './api'
 
@@ -15,6 +17,7 @@ const sections = [
   { id: 'prospects', label: 'Prospects', Screen: AdminProspects },
   { id: 'orders', label: 'Orders', Screen: AdminOrders },
   { id: 'customers', label: 'Customers', Screen: AdminCustomers },
+  { id: 'celebrations', label: 'Celebrations', Screen: AdminCelebrations },
   { id: 'reports', label: 'Reports', Screen: AdminReports },
 ]
 
@@ -26,7 +29,13 @@ export default function AdminApp() {
     rememberOwner(next === 'in')
     setSessionState(next)
   }
-  const [sectionId, setSectionId] = useState(sections[0].id)
+  // The tab can be opened directly with a link such as /admin#prospects (the morning email uses these).
+  const [sectionId, setSectionState] = useState(() => sections.find((section) => `#${section.id}` === window.location.hash)?.id ?? sections[0].id)
+  const setSectionId = (id) => {
+    window.history.replaceState(null, '', `#${id}`)
+    setSectionState(id)
+    window.scrollTo({ top: 0 })
+  }
 
   useEffect(() => {
     // Keep the admin area out of search results.
@@ -65,6 +74,7 @@ export default function AdminApp() {
 
   return (
     <AdminLayout sections={sections} sectionId={sectionId} onSectionChange={setSectionId} onLogout={onLogout}>
+      {sectionId === sections[0].id && <CelebrationsSummary onOpen={() => setSectionId('celebrations')} />}
       <Screen onSessionExpired={() => setSession('out')} />
     </AdminLayout>
   )

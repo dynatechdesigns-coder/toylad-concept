@@ -15,15 +15,16 @@ src/
   components/sections/  Hero, Services, Gallery, Packages, Testimonials, Booking
   components/ui/        Container, Button, SectionHeading, SmartImage
   data/                 site.js (contact, WhatsApp, locations, hours, socials, academy), services.js,
-                        gallery.js, packages.js, testimonials.js, stats.js, crm.js (lead statuses), orders.js, privacy.js
-  admin/                lazy-loaded: /admin (AdminApp sections: Photos, Prospects, Orders, Customers, Reports; api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
+                        gallery.js, packages.js, testimonials.js, stats.js, crm.js (lead statuses), orders.js, celebrations.js (greeting templates), privacy.js
+  admin/                lazy-loaded: /admin (AdminApp sections: Photos, Prospects, Orders, Customers, Celebrations, Reports; api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
   hooks/  utils/        useUploadedPhotos, useOwnerSession, gallery.js (All/category rules), cloudinary.js, booking.js, format.js
   App.jsx  Root.jsx (picks site or admin)  main.jsx  index.css
 api/
-  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, validate.js, photos.js, customers.js, leads.js, orders.js, reports.js
+  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, validate.js, photos.js, customers.js, leads.js, orders.js, reports.js, celebrations.js, digest.js
   auth/[action].js      login, logout, me in one function (Vercel Hobby allows 12 functions; there are 11, so merge rather than add files)
   photos.js enquiries.js  public: published photos; save a booking-form enquiry (honeypot, rate limit)
-  admin/                photos/, leads/, customers/ (each index + [id]), orders.js (edit with ?id=), tools/[action].js (upload-signature, health, reports)
+  admin/                photos/, leads/ (each index + [id]), customers.js, orders.js (one item with ?id=), tools/[action].js (upload-signature, health, reports, celebrations)
+  cron/daily-digest.js  morning email via Vercel Cron (06:00 UTC), protected by CRON_SECRET
 public/images/          local stock images    scripts/hash-password.js    vercel.json (/admin rewrite, noindex)
 ```
 
@@ -61,9 +62,8 @@ public/images/          local stock images    scripts/hash-password.js    vercel
 - Placeholder contact details, prices and stats are marked `// TODO` in `src/data/`.
 
 ## Backend and security rules
-- Env vars, server only (never `VITE_`-prefixed, never committed, documented in README.md): `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ADMIN_PASSWORD_HASH` (bcrypt), `SESSION_SECRET` (32+ chars).
+- Env vars, server only (never `VITE_`-prefixed, never committed, documented in README.md): `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ADMIN_PASSWORD_HASH` (bcrypt), `SESSION_SECRET` (32+ chars). Optional, for the morning email only: `RESEND_API_KEY`, `OWNER_EMAIL`, `CRON_SECRET`.
 - Wrap every handler in `route()` from `api/_lib/http.js`; every `/api/admin/*` route passes `{ auth: true }`. Validate all input on the server and throw `HttpError(status, message)`; responses are JSON, errors are `{ error }`.
 - Uploads go from the browser straight to Cloudinary with a signed request (folder `toylad/gallery`). Read image URL and size from Cloudinary, never from the browser. Show uploads through `cloudinaryUrl()` (`f_auto,q_auto`).
 - Session is an httpOnly, Secure, SameSite=Lax JWT cookie (7 days). Nothing secret in localStorage or the bundle. The public gallery must still work when the API fails: stock photos are the fallback (`showStockPhotos` in `gallery.js`).
-- Admin screens: plain wording for a non-technical owner, tap targets at least 48px, new dashboard areas go in `sections` in `AdminApp.jsx`.
-- Customer data (`customers`, `leads`) is personal data (Nigeria Data Protection Act 2023): never pre-tick consent, never block the WhatsApp booking on a failed save, keep "Delete customer" removing everything personal (their orders stay, anonymous, for sales reports), and update `data/privacy.js` when what is collected changes.
+- Admin screens: plain wording for a non-technical owner, tap targets at least 48px, new dashboard areas go in `sections` in `AdminApp.jsx`. Customer data (`customers`, `leads`) is personal data (Nigeria Data Protection Act 2023): never pre-tick consent, never block the WhatsApp booking on a failed save, keep "Delete customer" removing everything personal (their orders stay, anonymous, for sales reports), and update `data/privacy.js` when what is collected changes.

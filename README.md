@@ -16,7 +16,7 @@ Showcase, menu and booking site for Toylad Concept (custom cakes, pastries, even
 
 - **Site:** React + Vite + Tailwind CSS. Booking forms open WhatsApp with a pre-filled message.
 - **API:** Vercel serverless functions in `/api` (Node runtime).
-- **Database:** MongoDB Atlas, database `toylad`, collections `photos`, `customers`, `leads` (enquiries) and `orders`.
+- **Database:** MongoDB Atlas, database `toylad`, collections `photos`, `customers`, `leads` (enquiries), `orders` and `celebrationsSent`.
 - **Images:** Cloudinary, folder `toylad/gallery`. The browser uploads straight to Cloudinary using a signature from the API, so large phone photos never pass through Vercel.
 - **Login:** one owner password. A correct password sets a signed, httpOnly session cookie that lasts 7 days.
 
@@ -47,6 +47,19 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 Until these are set, the public site still works and shows the stock photos.
 
+### Optional: the daily morning email
+
+Leave these empty and everything else works as normal; only the email is switched off.
+
+| Name | What it is |
+|---|---|
+| `RESEND_API_KEY` | API key from [Resend](https://resend.com), which sends the email. |
+| `OWNER_EMAIL` | Where the email goes. With Resend's free shared sender this must be the address the Resend account was opened with. |
+| `CRON_SECRET` | Long random string (at least 16 characters). Vercel sends it with the daily job, and the job refuses every request without it. |
+| `RESEND_FROM` | Only if you verify your own domain in Resend: the sender, e.g. `Toylad Concept <hello@yourdomain.com>`. Otherwise leave it out. |
+
+Vercel Cron (`crons` in `vercel.json`) calls `/api/cron/daily-digest` once a day at 06:00 UTC, which is 7am in Nigeria. On the Hobby plan Vercel may run it any time within that hour. The email lists today's celebrations, prospects to follow up, and orders delivered 3 days ago to ask for feedback, each with a link to the right admin tab. No email is sent on a day with nothing to report. Cron jobs only run on the production deployment.
+
 ## API
 
 | Route | Access | Purpose |
@@ -70,9 +83,12 @@ Until these are set, the public site still works and shows the stock photos.
 | `POST /api/admin/leads` | owner | Record an enquiry that came by WhatsApp, phone or walk-in. |
 | `PATCH /api/admin/leads/:id` | owner | Change status (a reason is required for "lost") or the follow-up date. |
 | `GET /api/admin/customers` | owner | All customers, most recently in touch first. |
-| `GET /api/admin/customers/:id` | owner | One customer with all their enquiries. |
-| `PATCH /api/admin/customers/:id` | owner | Edit details, consent or notes; `addNote` adds a dated note. |
-| `DELETE /api/admin/customers/:id` | owner | Delete the customer and all their enquiries. Their orders stay, with no name, phone or notes. |
+| `GET /api/admin/customers?id=…` | owner | One customer with all their enquiries and orders. |
+| `PATCH /api/admin/customers?id=…` | owner | Edit details, consent or notes; `addNote` adds a dated note. |
+| `DELETE /api/admin/customers?id=…` | owner | Delete the customer and all their enquiries. Their orders stay, with no name, phone or notes. |
+| `GET /api/admin/tools/celebrations` | owner | Birthdays, anniversaries and event anniversaries in the next 7 days. |
+| `POST /api/admin/tools/celebrations` | owner | Mark one as "wishes sent" for this year. |
+| `GET /api/cron/daily-digest` | Vercel Cron | Send the morning email. Needs `Authorization: Bearer <CRON_SECRET>`. |
 
 Errors come back as JSON: `{ "error": "message" }`.
 
@@ -94,7 +110,16 @@ Errors come back as JSON: `{ "error": "message" }`.
 - **Loyal customers** have 3 or more orders. **Quiet customers** ordered before but not in the last 6 months; the "We miss you" button only appears for customers who agreed to offers.
 - **Export to Excel** on the Reports tab saves customers or orders as a `.csv` file.
 - **Deleting a customer** keeps their orders in the sales figures, but removes the link to them and the order notes.
-- **Vercel function limit:** the Hobby plan allows 12 serverless functions and this project uses 11. Related routes share one file (`api/auth/[action].js`, `api/admin/tools/[action].js`, `api/admin/orders.js`).
+- **Vercel function limit:** the Hobby plan allows 12 serverless functions and this project uses 11. Related routes share one file (`api/auth/[action].js`, `api/admin/tools/[action].js`, `api/admin/orders.js`, `api/admin/customers.js`).
+
+## Celebrations
+
+- **Who appears:** only customers who agreed to offers. Birthdays and wedding anniversaries come from the customer record; "event anniversaries" are whole years since a delivered order that has an occasion.
+- **When:** from today up to 6 days ahead. A 29 February birthday shows on 28 February in other years.
+- **Sending:** "Send wishes" opens WhatsApp with a greeting she can edit before sending. Nothing is sent automatically, and no paid WhatsApp service is used.
+- **Wording and offer:** edit `wishTemplates` and `celebrationOffer` in `src/data/celebrations.js`.
+- **Done:** marks that celebration as sent for the year (collection `celebrationsSent`), so it leaves the list until next year.
+- **Tab links:** `/admin#prospects`, `/admin#orders`, `/admin#celebrations` and so on open that tab directly.
 
 ## Gallery rules
 

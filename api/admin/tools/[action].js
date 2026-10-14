@@ -1,12 +1,14 @@
+import { buildCelebrations, sentCollection } from '../../_lib/celebrations.js'
 import { GALLERY_FOLDER, getCloudinary } from '../../_lib/cloudinary.js'
 import { customersCollection } from '../../_lib/customers.js'
 import { getDb } from '../../_lib/db.js'
-import { route } from '../../_lib/http.js'
+import { HttpError, readJson, route } from '../../_lib/http.js'
 import { leadsCollection } from '../../_lib/leads.js'
-import { ordersCollection } from '../../_lib/orders.js'
+import { ordersCollection, todayInNigeria } from '../../_lib/orders.js'
 import { buildReports } from '../../_lib/reports.js'
+import { objectId } from '../../_lib/validate.js'
 
-// One function serves /api/admin/tools/upload-signature, /health and /reports, to stay within
+// One function serves /api/admin/tools/upload-signature, /health, /reports and /celebrations, to stay within
 // Vercel's limit of 12 functions. Every action requires the owner's session.
 
 const REQUIRED = ['MONGODB_URI', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET', 'ADMIN_PASSWORD_HASH', 'SESSION_SECRET']
@@ -93,6 +95,32 @@ const actions = {
     async GET() {
       const checks = [settingsCheck(), ...(await Promise.all([databaseCheck(), storageCheck()]))]
       return { ok: checks.every((check) => check.ok), checks }
+    },
+  },
+
+  // Occasions in the coming week (GET), and marking one as "wishes sent" for its year (POST).
+  celebrations: {
+    async GET() {
+      const [customers, orders, sent] = await Promise.all(
+        [await customersCollection(), await ordersCollection(), await sentCollection()].map((collection) => collection.find({}).limit(10000).toArray()),
+      )
+      return { celebrations: buildCelebrations({ customers, orders, sent }) }
+    },
+    async POST(req) {
+      const { key, year } = readJson(req)
+      const thisYear = Number(todayInNigeria().slice(0, 4))
+      if (typeof key !== 'string' || !/^(birthday|anniversary|event):[0-9a-f]{24}$/.test(key)) throw new HttpError(400, 'That celebration is not valid.')
+      if (!Number.isInteger(year) || Math.abs(year - thisYear) > 1) throw new HttpError(400, 'That year is not valid.')
+
+      // Remember whose it is, so deleting the customer also removes this record.
+      const [kind, id] = key.split(':')
+      const _id = objectId(id)
+      const customerId = kind === 'event' ? (await (await ordersCollection()).findOne({ _id }))?.customerId : _id
+      if (!customerId || !(await (await customersCollection()).findOne({ _id: customerId }))) throw new HttpError(404, 'That customer no longer exists.')
+
+      const sent = await sentCollection()
+      await sent.updateOne({ key, year }, { $set: { key, year, customerId, sentAt: new Date() } }, { upsert: true })
+      return { done: true }
     },
   },
 

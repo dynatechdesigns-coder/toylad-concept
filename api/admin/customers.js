@@ -1,18 +1,27 @@
-import { customerValidators, customersCollection, toCustomer } from '../../_lib/customers.js'
-import { HttpError, readJson, route } from '../../_lib/http.js'
-import { leadsCollection, toLead } from '../../_lib/leads.js'
-import { ordersCollection, toOrder } from '../../_lib/orders.js'
-import { objectId, pickFields, text, toUpdate } from '../../_lib/validate.js'
+import { sentCollection } from '../_lib/celebrations.js'
+import { customerValidators, customersCollection, toCustomer } from '../_lib/customers.js'
+import { HttpError, readJson, route } from '../_lib/http.js'
+import { leadsCollection, toLead } from '../_lib/leads.js'
+import { ordersCollection, toOrder } from '../_lib/orders.js'
+import { objectId, pickFields, text, toUpdate } from '../_lib/validate.js'
 
+// One function for the whole resource: the list, and one customer with ?id=… (to stay within Vercel's function limit).
 const notFound = () => new HttpError(404, 'That customer no longer exists.')
 const validators = { ...customerValidators, addNote: text('The note', { max: 1000, required: true }) }
 
 export default route(
   {
-    // One customer with all their enquiries and orders, newest first.
     async GET(req) {
+      const customers = await customersCollection()
+      // Without an id: every customer, most recently in touch first. The admin page searches this list in the browser.
+      if (!req.query.id) {
+        const docs = await customers.find({}).sort({ lastContactAt: -1 }).limit(2000).toArray()
+        return { customers: docs.map(toCustomer) }
+      }
+
+      // With an id: that customer with all their enquiries and orders, newest first.
       const _id = objectId(req.query.id)
-      const customer = await (await customersCollection()).findOne({ _id })
+      const customer = await customers.findOne({ _id })
       if (!customer) throw notFound()
       const leads = await (await leadsCollection()).find({ customerId: _id }).sort({ createdAt: -1 }).toArray()
       const orders = await (await ordersCollection()).find({ customerId: _id }).sort({ orderDate: -1 }).toArray()
@@ -64,6 +73,7 @@ export default route(
       if (!(await customers.findOne({ _id }))) throw notFound()
       const { deletedCount } = await (await leadsCollection()).deleteMany({ customerId: _id })
       const kept = await (await ordersCollection()).updateMany({ customerId: _id }, { $set: { notes: '', updatedAt: new Date() }, $unset: { customerId: '', leadId: '' } })
+      await (await sentCollection()).deleteMany({ customerId: _id })
       await customers.deleteOne({ _id })
       return { deleted: true, enquiriesDeleted: deletedCount, ordersKept: kept.modifiedCount }
     },

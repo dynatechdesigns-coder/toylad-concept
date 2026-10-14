@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { ArrowLeft, LogOut } from 'lucide-react'
 import Logo from '../components/layout/Logo'
 import Container from '../components/ui/Container'
@@ -9,6 +10,13 @@ const tab =
 
 // Header shared by every admin screen, styled like the public navbar. One tab per dashboard section.
 export default function AdminLayout({ sections, sectionId, onSectionChange, onLogout, children }) {
+  const navRef = useRef(null)
+
+  // With several tabs the bar scrolls sideways on a phone: keep the chosen tab in view.
+  useEffect(() => {
+    navRef.current?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'center' })
+  }, [sectionId])
+
   return (
     <div className="min-h-dvh bg-cream">
       <header className="sticky top-0 z-40 bg-cream/90 shadow-sm backdrop-blur">
@@ -27,7 +35,7 @@ export default function AdminLayout({ sections, sectionId, onSectionChange, onLo
         </Container>
 
         <Container>
-          <nav aria-label="Admin sections" className="flex gap-3 overflow-x-auto pb-3 pt-1 [scrollbar-width:none]">
+          <nav ref={navRef} aria-label="Admin sections" className="flex gap-3 overflow-x-auto pb-3 pt-1 [scrollbar-width:none]">
             {sections.map((section) => {
               const active = section.id === sectionId
               return (

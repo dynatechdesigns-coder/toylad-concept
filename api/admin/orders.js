@@ -75,6 +75,9 @@ export default route(
       const deposit = fields.deposit === undefined ? current.deposit : fields.deposit
       checkDeposit(fields.amount ?? current.amount, deposit)
       if (fields.notes === null) fields.notes = ''
+      // Remember the day it was actually delivered: the morning email asks for feedback three days later.
+      if (fields.status === 'delivered' && current.status !== 'delivered') fields.deliveredAt = new Date()
+      if (fields.status && fields.status !== 'delivered') fields.deliveredAt = null
 
       const doc = await orders.findOneAndUpdate({ _id }, toUpdate(fields, { updatedAt: new Date() }), { returnDocument: 'after' })
       const customer = doc.customerId ? await (await customersCollection()).findOne({ _id: doc.customerId }) : null
