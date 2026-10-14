@@ -56,7 +56,7 @@ export function validateBooking(values) {
   return errors
 }
 
-function displayValue(field, values) {
+export function displayValue(field, values) {
   const value = values[field.name].trim()
   if (field.type === 'select') {
     return optionsFor(field, values).find((option) => option.value === value)?.label ?? value

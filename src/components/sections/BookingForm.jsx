@@ -11,13 +11,20 @@ import {
   validateField,
   visibleFields,
 } from '../../utils/booking'
+import { saveEnquiry } from '../../utils/enquiry'
 import { whatsappUrl } from '../../utils/format'
 import Button from '../ui/Button'
 import FormField from '../ui/FormField'
+import BookingExtras from './BookingExtras'
 import BookingSuccess from './BookingSuccess'
+import PrivacyNotice from './PrivacyNotice'
+
+const noDate = { day: '', month: '' }
+const emptyExtras = { birthday: noDate, anniversary: noDate, consent: false, website: '' }
 
 export default function BookingForm({ bookingPreset }) {
   const [values, setValues] = useState(emptyBooking)
+  const [extras, setExtras] = useState(emptyExtras)
   const [errors, setErrors] = useState({})
   const [sentHref, setSentHref] = useState(null)
   const formRef = useRef(null)
@@ -56,11 +63,14 @@ export default function BookingForm({ bookingPreset }) {
     }
     const href = whatsappUrl(buildBookingMessage(values))
     window.open(href, '_blank', 'noopener,noreferrer')
+    // Keep a copy for the shop's records. WhatsApp has already opened, so this cannot hold the customer up.
+    saveEnquiry(values, extras)
     setSentHref(href)
   }
 
   const reset = () => {
     setValues(emptyBooking)
+    setExtras(emptyExtras)
     setErrors({})
     setSentHref(null)
   }
@@ -89,10 +99,12 @@ export default function BookingForm({ bookingPreset }) {
           />
         ))}
       </div>
+      <BookingExtras extras={extras} onChange={setExtras} />
 
       <Button type="submit" size="lg" icon={Send} className="mt-8 w-full">
         Send request on WhatsApp
       </Button>
+      <PrivacyNotice />
       {mailtoHref && (
         <p className="mt-4 text-center text-sm text-espresso/70">
           Prefer email?{' '}

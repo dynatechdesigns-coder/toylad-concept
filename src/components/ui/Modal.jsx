@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useId, useRef } from 'react'
 import { X } from 'lucide-react'
 
 // Native modal <dialog>: the browser traps focus, and Esc or a tap outside closes it.
-export default function AdminDialog({ title, onClose, children }) {
+export default function Modal({ title, onClose, children }) {
   const dialogRef = useRef(null)
+  const titleId = useId()
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -14,7 +15,7 @@ export default function AdminDialog({ title, onClose, children }) {
   return (
     <dialog
       ref={dialogRef}
-      aria-labelledby="admin-dialog-title"
+      aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault()
         onClose()
@@ -33,7 +34,7 @@ export default function AdminDialog({ title, onClose, children }) {
         >
           <X className="size-5" aria-hidden="true" />
         </button>
-        <h2 id="admin-dialog-title" className="pr-12 text-xl font-semibold md:text-2xl">
+        <h2 id={titleId} className="pr-12 text-xl font-semibold md:text-2xl">
           {title}
         </h2>
         {children}

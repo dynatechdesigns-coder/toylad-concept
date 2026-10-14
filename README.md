@@ -16,7 +16,7 @@ Showcase, menu and booking site for Toylad Concept (custom cakes, pastries, even
 
 - **Site:** React + Vite + Tailwind CSS. Booking forms open WhatsApp with a pre-filled message.
 - **API:** Vercel serverless functions in `/api` (Node runtime).
-- **Database:** MongoDB Atlas, database `toylad`, collection `photos`.
+- **Database:** MongoDB Atlas, database `toylad`, collections `photos`, `customers` and `leads` (enquiries).
 - **Images:** Cloudinary, folder `toylad/gallery`. The browser uploads straight to Cloudinary using a signature from the API, so large phone photos never pass through Vercel.
 - **Login:** one owner password. A correct password sets a signed, httpOnly session cookie that lasts 7 days.
 
@@ -61,8 +61,26 @@ Until these are set, the public site still works and shows the stock photos.
 | `PATCH /api/admin/photos/:id` | owner | Change title, category, visibility or order. |
 | `DELETE /api/admin/photos/:id` | owner | Delete from Cloudinary and MongoDB. |
 | `GET /api/admin/health` | owner | Check the settings, the database and photo storage. Never returns secret values. |
+| `POST /api/enquiries` | public | Save a copy of a booking-form enquiry: creates or updates the customer by phone and adds a lead. |
+| `GET /api/admin/leads` | owner | Open enquiries, newest first (`?scope=all` for every enquiry). |
+| `POST /api/admin/leads` | owner | Record an enquiry that came by WhatsApp, phone or walk-in. |
+| `PATCH /api/admin/leads/:id` | owner | Change status (a reason is required for "lost") or the follow-up date. |
+| `GET /api/admin/customers` | owner | All customers, most recently in touch first. |
+| `GET /api/admin/customers/:id` | owner | One customer with all their enquiries. |
+| `PATCH /api/admin/customers/:id` | owner | Edit details, consent or notes; `addNote` adds a dated note. |
+| `DELETE /api/admin/customers/:id` | owner | Delete the customer and all their enquiries. |
 
 Errors come back as JSON: `{ "error": "message" }`.
+
+## Customers and prospects
+
+- **Booking form:** it opens WhatsApp exactly as before, and also sends a copy to `/api/enquiries` in the background. If saving fails the customer never notices.
+- **Customers** are matched by phone number, stored as `+234…`. A second enquiry from the same number updates the same customer; it only fills in missing details and can turn offers consent on, never off.
+- **Consent:** the offers box is never ticked for the customer. The date consent was given is stored with it.
+- **Prospects tab:** enquiries not yet delivered or lost. An enquiry still "new" or "quoted" after 2 days gets a "Follow up" badge; opening WhatsApp from the card or marking it "quoted" restarts the 2 days.
+- **Deleting a customer** in the Customers tab removes them and all their enquiries, for deletion requests under the Nigeria Data Protection Act 2023.
+- **Privacy notice:** the wording is in `src/data/privacy.js`. The "kept for up to two years" period is a placeholder to confirm.
+- **Spam protection:** a hidden honeypot field, and at most 5 enquiries per 10 minutes from one address (per server instance, so approximate).
 
 ## Gallery rules
 

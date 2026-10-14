@@ -1,14 +1,13 @@
 import { Trash2 } from 'lucide-react'
 import Button from '../components/ui/Button'
-import AdminDialog from './AdminDialog'
+import Modal from '../components/ui/Modal'
 import { actionButton } from './fieldStyles'
 
-export default function ConfirmDeleteDialog({ photo, busy, error, onConfirm, onClose }) {
+// `message` says exactly what will be deleted.
+export default function ConfirmDeleteDialog({ message, busy, error, onConfirm, onClose }) {
   return (
-    <AdminDialog title="Are you sure?" onClose={onClose}>
-      <p className="mt-3 text-base leading-relaxed text-espresso/75 md:text-lg">
-        “{photo.title}” will be deleted and removed from the website. You cannot undo this.
-      </p>
+    <Modal title="Are you sure?" onClose={onClose}>
+      <p className="mt-3 break-words text-base leading-relaxed text-espresso/75 md:text-lg">{message}</p>
       {error && (
         <p role="alert" className="mt-4 rounded-2xl border border-terracotta-deep bg-butter-soft p-3 text-base font-medium text-espresso">
           {error}
@@ -22,6 +21,6 @@ export default function ConfirmDeleteDialog({ photo, busy, error, onConfirm, onC
           No, keep it
         </button>
       </div>
-    </AdminDialog>
+    </Modal>
   )
 }

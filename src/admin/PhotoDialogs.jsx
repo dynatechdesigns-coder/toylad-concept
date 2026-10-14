@@ -22,7 +22,7 @@ export default function PhotoDialogs({ dialog, busy, error, onUpdate, onRemove, 
   if (dialog?.type === 'delete') {
     return (
       <ConfirmDeleteDialog
-        photo={dialog.photo}
+        message={`“${dialog.photo.title}” will be deleted and removed from the website. You cannot undo this.`}
         busy={busy}
         error={error}
         onConfirm={() => closeAfter(onRemove(dialog.photo.id))}

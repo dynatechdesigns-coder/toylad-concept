@@ -15,15 +15,15 @@ src/
   components/sections/  Hero, Services, Gallery, Packages, Testimonials, Booking
   components/ui/        Container, Button, SectionHeading, SmartImage
   data/                 site.js (contact, WhatsApp, locations, hours, socials, academy), services.js,
-                        gallery.js, packages.js, testimonials.js, stats.js
-  admin/                lazy-loaded: /admin (AdminApp sections, login, photo screens, api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
+                        gallery.js, packages.js, testimonials.js, stats.js, crm.js (lead statuses), privacy.js
+  admin/                lazy-loaded: /admin (AdminApp sections: Photos, Prospects, Customers; api.js) and owner mode on the public site (OwnerBar, OwnerGalleryTools)
   hooks/  utils/        useUploadedPhotos, useOwnerSession, gallery.js (All/category rules), cloudinary.js, booking.js, format.js
   App.jsx  Root.jsx (picks site or admin)  main.jsx  index.css
 api/
-  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, photos.js
-  auth/                 login, logout, me
-  photos.js             public list of published photos
-  admin/                upload-signature, health (connection check), photos/index (list, create), photos/[id] (edit, delete)
+  _lib/                 http.js (route wrapper, HttpError), auth.js (session), db.js, cloudinary.js, validate.js, photos.js, customers.js, leads.js
+  auth/[action].js      login, logout, me in one function (Vercel Hobby allows 12 functions; there are 11)
+  photos.js enquiries.js  public: published photos; save a booking-form enquiry (honeypot, rate limit)
+  admin/                upload-signature, health, photos/ (index, [id]), leads/ (index, [id]), customers/ (index, [id])
 public/images/          local stock images    scripts/hash-password.js    vercel.json (/admin rewrite, noindex)
 ```
 
@@ -64,6 +64,6 @@ public/images/          local stock images    scripts/hash-password.js    vercel
 - Env vars, server only (never `VITE_`-prefixed, never committed, documented in README.md): `MONGODB_URI`, `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`, `ADMIN_PASSWORD_HASH` (bcrypt), `SESSION_SECRET` (32+ chars).
 - Wrap every handler in `route()` from `api/_lib/http.js`; every `/api/admin/*` route passes `{ auth: true }`. Validate all input on the server and throw `HttpError(status, message)`; responses are JSON, errors are `{ error }`.
 - Uploads go from the browser straight to Cloudinary with a signed request (folder `toylad/gallery`). Read image URL and size from Cloudinary, never from the browser. Show uploads through `cloudinaryUrl()` (`f_auto,q_auto`).
-- Session is an httpOnly, Secure, SameSite=Lax JWT cookie (7 days). Nothing secret in localStorage or the bundle.
-- The public gallery must still work when the API fails: stock photos are the fallback (`showStockPhotos` in `gallery.js`).
+- Session is an httpOnly, Secure, SameSite=Lax JWT cookie (7 days). Nothing secret in localStorage or the bundle. The public gallery must still work when the API fails: stock photos are the fallback (`showStockPhotos` in `gallery.js`).
 - Admin screens: plain wording for a non-technical owner, tap targets at least 48px, new dashboard areas go in `sections` in `AdminApp.jsx`.
+- Customer data (`customers`, `leads`) is personal data (Nigeria Data Protection Act 2023): never pre-tick consent, never block the WhatsApp booking on a failed save, keep "Delete customer" removing everything, and update `data/privacy.js` when what is collected changes.

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import Button from '../components/ui/Button'
 import { rememberOwner } from '../utils/ownerHint'
-import AdminDialog from './AdminDialog'
+import Modal from '../components/ui/Modal'
 import PhotoActions from './PhotoActions'
 import PhotoDialogs from './PhotoDialogs'
 import PhotoUploader from './PhotoUploader'
@@ -54,11 +54,11 @@ export default function OwnerGalleryTools({ onChanged, onSignedOut, children }) 
 
       <PhotoDialogs dialog={dialog} busy={busy} error={error} onUpdate={update} onRemove={remove} onClose={() => setDialog(null)} />
       {dialog?.type === 'upload' && (
-        <AdminDialog title="Add photo" onClose={() => setDialog(null)}>
+        <Modal title="Add photo" onClose={() => setDialog(null)}>
           <div className="mt-6">
             <PhotoUploader stacked onUploaded={add} onSessionExpired={onSessionExpired} onProblem={noop} />
           </div>
-        </AdminDialog>
+        </Modal>
       )}
     </>
   )

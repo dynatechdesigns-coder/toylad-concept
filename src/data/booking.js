@@ -10,6 +10,13 @@ export const bookingIntro = {
   whatsappGreeting: `Hello ${site.name}! I would like to make an enquiry.`,
 }
 
+// Optional extras under the main fields. They are saved with the enquiry, not sent in the WhatsApp message.
+export const bookingExtras = {
+  birthday: 'Your birthday (day and month)',
+  anniversary: 'Wedding anniversary (day and month, optional)',
+  consent: `Send me occasional offers and birthday wishes from ${site.name} on WhatsApp.`,
+}
+
 export const bookingSteps = [
   { title: 'Tell us your idea', text: 'Share your date, theme and any inspiration photos.', icon: Lightbulb },
   { title: 'Get a quote', text: 'We send options and a friendly price for your event.', icon: ReceiptText },

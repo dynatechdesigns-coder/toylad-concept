@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Button from '../components/ui/Button'
-import AdminDialog from './AdminDialog'
+import Modal from '../components/ui/Modal'
 import PhotoFields from './PhotoFields'
 import { actionButton } from './fieldStyles'
 
@@ -19,7 +19,7 @@ export default function PhotoEditDialog({ photo, busy, error, onSave, onClose })
   }
 
   return (
-    <AdminDialog title="Edit photo" onClose={onClose}>
+    <Modal title="Edit photo" onClose={onClose}>
       <form onSubmit={onSubmit} noValidate className="mt-6">
         <PhotoFields
           idPrefix="edit-photo"
@@ -46,6 +46,6 @@ export default function PhotoEditDialog({ photo, busy, error, onSave, onClose })
           </button>
         </div>
       </form>
-    </AdminDialog>
+    </Modal>
   )
 }

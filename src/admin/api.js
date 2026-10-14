@@ -45,6 +45,14 @@ export const updatePhoto = (id, changes) => request(`/api/admin/photos/${id}`, {
 export const deletePhoto = (id) => request(`/api/admin/photos/${id}`, { method: 'DELETE' })
 export const getHealth = () => request('/api/admin/health')
 
+export const listLeads = () => request('/api/admin/leads')
+export const createLead = (enquiry) => request('/api/admin/leads', { method: 'POST', body: enquiry })
+export const updateLead = (id, changes) => request(`/api/admin/leads/${id}`, { method: 'PATCH', body: changes })
+export const listCustomers = () => request('/api/admin/customers')
+export const getCustomer = (id) => request(`/api/admin/customers/${id}`)
+export const updateCustomer = (id, changes) => request(`/api/admin/customers/${id}`, { method: 'PATCH', body: changes })
+export const deleteCustomer = (id) => request(`/api/admin/customers/${id}`, { method: 'DELETE' })
+
 // Runs one upload step; on failure the message says which step it was. 401 passes through untouched.
 async function inStep(step, action) {
   try {
